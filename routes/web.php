@@ -1,11 +1,14 @@
 <?php
 
+// Semua 'use' statement dikumpulkan di atas agar rapi
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReadingMaterialViewController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\DashboardController; // Pastikan ini ada
 use App\Http\Controllers\Admin\GenreController;
-use App\Http\Controllers\Admin\HotsActivityController; // <-- DITAMBAHKAN
+use App\Http\Controllers\Admin\HotsActivityController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
 
 /*
@@ -18,18 +21,17 @@ use App\Http\Controllers\Admin\ReadingMaterialController;
 */
 
 // == HALAMAN PUBLIK / UNTUK SISWA ==
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 // Route untuk menampilkan detail materi kepada siswa
 Route::get('/materials/{material}', [ReadingMaterialViewController::class, 'show'])->name('materials.show');
 
 
 // == HALAMAN PENGGUNA TERAUTENTIKASI (SISWA/USER BIASA) ==
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+// BARIS INI YANG DIUBAH
+// Route dashboard sekarang akan memanggil DashboardController@index
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
