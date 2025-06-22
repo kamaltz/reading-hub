@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-gray-900;
+    }
+}
+
+@layer components {
+    .card-container {
+        perspective: 1000px;
+    }
+    .card-content {
+        transform-style: preserve-3d;
+        transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
+    }
+    .card-container:hover .card-content {
+        transform: translateZ(20px) rotateY(3deg);
+        box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+    }
+}
+
+/* Animasi untuk elemen yang muncul saat di-scroll */
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-in-up {
+    animation: slide-in-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
