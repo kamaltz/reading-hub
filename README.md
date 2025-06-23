@@ -1,61 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Tutorial Instalasi Proyek Reading Hub (Laravel)
+Dokumen ini akan memandu Anda melalui proses untuk mengkloning (clone), mengkonfigurasi, dan menjalankan proyek Laravel "Reading Hub" di komputer lokal Anda.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Prasyarat (Perangkat Lunak yang Dibutuhkan)
+Sebelum memulai, pastikan Anda memiliki lingkungan pengembangan yang siap. Kami sangat merekomendasikan penggunaan Laragon karena sudah mencakup hampir semua yang Anda butuhkan dalam satu paket instalasi.
 
-## About Laravel
+Opsi 1: Instalasi Menggunakan Laragon (Sangat Direkomendasikan)
+Laragon adalah lingkungan pengembangan lokal portabel, terisolasi, cepat, dan kuat untuk PHP, Node.js, Python, Java, Go, Ruby. Laragon sudah mencakup Git, PHP, Composer, server database (MySQL), dan terminal yang terintegrasi.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Unduh dan Instal Laragon:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Kunjungi situs web resmi Laragon: https://laragon.org/download/
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Unduh versi Laragon - Full.
 
-## Learning Laravel
+Jalankan installer dan ikuti petunjuk di layar. Disarankan untuk tidak menginstalnya di direktori C:\Program Files untuk menghindari masalah perizinan. Gunakan direktori seperti C:\laragon.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Jalankan Laragon:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Setelah instalasi selesai, buka Laragon.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Klik tombol "Start All". Ini akan menjalankan server web Apache/Nginx dan server database MySQL.
 
-## Laravel Sponsors
+Buka Terminal Laragon:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Klik tombol "Terminal" di jendela utama Laragon. Terminal ini sudah memiliki akses ke PHP, Composer, Git, dan Node.js/NPM.
 
-### Premium Partners
+Semua perintah selanjutnya dalam tutorial ini harus dijalankan melalui Terminal Laragon ini.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Dengan menggunakan Laragon, Anda dapat melewatkan instalasi manual untuk Git, PHP, Composer, dan server database.
 
-## Contributing
+Opsi 2: Instalasi Manual
+Jika Anda tidak menggunakan Laragon, pastikan Anda telah menginstal perangkat lunak berikut secara terpisah:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Git: Untuk mengkloning repositori. Unduh Git
 
-## Code of Conduct
+PHP: Versi 8.1 atau lebih baru. Unduh PHP
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Composer: Manajer dependensi untuk PHP. Unduh Composer
 
-## Security Vulnerabilities
+Node.js & NPM: Untuk mengelola dependensi JavaScript. Unduh Node.js
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Database Server: Seperti MySQL atau MariaDB (misalnya dari XAMPP).
 
-## License
+Langkah 1: Clone Repositori dari Git
+Buka Terminal Laragon (atau terminal biasa jika tidak memakai Laragon), navigasikan ke direktori www di dalam folder instalasi Laragon (cd C:/laragon/www), lalu jalankan perintah berikut. Ganti [URL_REPOSITORY_ANDA] dengan URL repositori Git proyek Anda.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+git clone [URL_REPOSITORY_ANDA] reading-hub
+
+Setelah selesai, masuk ke direktori proyek yang baru dibuat:
+
+cd reading-hub
+
+Langkah 2: Instal Dependensi PHP
+Gunakan Composer untuk menginstal semua pustaka PHP yang dibutuhkan.
+
+composer install
+
+Langkah 3: Instal Dependensi JavaScript
+Selanjutnya, instal semua paket JavaScript yang dibutuhkan menggunakan NPM.
+
+npm install
+
+Langkah 4: Konfigurasi File Lingkungan (.env)
+Salin file .env.example menjadi file baru bernama .env.
+
+cp .env.example .env
+
+Langkah 5: Buat Kunci Aplikasi (Application Key)
+Jalankan perintah Artisan berikut untuk membuat kunci enkripsi yang unik.
+
+php artisan key:generate
+
+Langkah 6: Konfigurasi Database
+Jika menggunakan Laragon: Klik tombol "Database" di jendela Laragon. Ini akan membuka HeidiSQL.
+
+Di HeidiSQL, klik kanan di panel kiri -> Create new -> Database.
+
+Beri nama database, contohnya: reading_hub_db.
+
+Buka file .env dengan editor teks.
+
+Sesuaikan konfigurasi database. Untuk Laragon, username default adalah root dan password kosong.
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=reading_hub_db // Ganti dengan nama database Anda
+DB_USERNAME=root // Username default Laragon
+DB_PASSWORD= // Password default Laragon kosong
+
+Langkah 7: Jalankan Migrasi Database
+Setelah database dikonfigurasi, jalankan perintah migrasi untuk membuat semua tabel.
+
+php artisan migrate
+
+Catatan: Jika Anda ingin menjalankan migrasi dari awal dan menghapus semua data, gunakan php artisan migrate:fresh.
+
+Langkah 8: Hubungkan Penyimpanan (Storage)
+Buat tautan simbolis (symbolic link) agar file yang diunggah dapat diakses dari web.
+
+php artisan storage:link
+
+Langkah 9: Jalankan Server Pengembangan
+Sekarang, Anda siap untuk menjalankan aplikasi!
+
+Jalankan server PHP Laravel:
+
+php artisan serve
+
+Jalankan Vite untuk kompilasi aset (CSS & JS): Buka Terminal Laragon baru, navigasikan ke direktori proyek (cd C:/laragon/www/reading-hub), dan jalankan:
+
+npm run dev
+
+Setelah kedua server berjalan, buka browser Anda dan kunjungi alamat yang diberikan oleh php artisan serve (biasanya http://127.0.0.1:8000).
