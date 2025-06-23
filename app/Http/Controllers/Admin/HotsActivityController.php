@@ -23,6 +23,17 @@ class HotsActivityController extends Controller
     }
 
     /**
+     * Menampilkan daftar semua aktivitas dari semua materi.
+     */
+    public function all()
+    {
+        // Ambil semua aktivitas, beserta relasi ke materi induknya
+        // Urutkan dari yang terbaru, dan gunakan pagination
+        $activities = HotsActivity::with('readingMaterial')->latest()->paginate(15);
+        return view('admin.activities.all', compact('activities'));
+    }
+
+    /**
      * Menampilkan form untuk membuat aktivitas baru untuk materi spesifik.
      * Menerima $material karena route-nya nested.
      */
