@@ -61,6 +61,9 @@ Route::prefix('admin')
         // Diletakkan di sini karena merupakan bagian dari manajemen admin
         Route::resource('materials.activities', HotsActivityController::class)->shallow();
 
+        // Route untuk melihat semua aktivitas secara global
+        Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
+
     });
 
 
