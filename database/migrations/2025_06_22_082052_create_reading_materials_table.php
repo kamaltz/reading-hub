@@ -11,19 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('activities', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('material_id')->constrained('reading_materials')->onDelete('cascade');
-    $table->foreignId('genre_id')->nullable()->constrained('genres')->onDelete('cascade'); // Pastikan baris ini ada
-    $table->text('question');
-    $table->string('option_a')->nullable();
-    $table->string('option_b')->nullable();
-    $table->string('option_c')->nullable();
-    $table->string('option_d')->nullable();
-    $table->string('correct_answer')->nullable();
-    $table->enum('type', ['multiple_choice', 'essay']);
-    $table->timestamps();
-});
+        // Corrected to create the 'reading_materials' table
+        Schema::create('reading_materials', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('chapter_id')->constrained('chapters')->onDelete('cascade');
+            $table->foreignId('genre_id')->constrained('genres')->onDelete('cascade');
+            $table->string('title');
+            $table->text('content');
+            $table->string('illustration_path')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
