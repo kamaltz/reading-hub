@@ -6,9 +6,10 @@ use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReadingMaterialViewController;
 use App\Http\Controllers\Admin\ChapterController;
-use App\Http\Controllers\Admin\DashboardController; // Pastikan ini ada
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\HotsActivityController;
+use App\Http\Controllers\Admin\StudentProgressController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
 
 /*
@@ -63,6 +64,9 @@ Route::prefix('admin')
 
         // Route untuk melihat semua aktivitas secara global
         Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
+
+        // Route untuk memonitoring progres siswa
+        Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
 
     });
 

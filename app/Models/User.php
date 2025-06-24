@@ -9,8 +9,27 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Check if the user has admin role.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user has student role.
+     *
+     * @return bool
+     */
+    public function isStudent(): bool
+    {
+        return $this->role === 'student';
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -21,7 +40,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
+
+    public function hotsActivityAnswers()
+    {
+        return $this->hasMany(StudentHotsActivityAnswer::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

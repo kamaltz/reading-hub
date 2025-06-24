@@ -32,4 +32,9 @@ class HotsActivity extends Model
     {
         return $this->belongsTo(\App\Models\ReadingMaterial::class);
     }
+
+    public function studentAnswers()
+    {
+        return $this->hasMany(StudentHotsActivityAnswer::class);
+    }
 }

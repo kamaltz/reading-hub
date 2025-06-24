@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hots_activities', function (Blueprint $table) {
-            $table->integer('sequence')->default(0)->after('answer');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('role')->default('student')->after('password');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hots_activities', function (Blueprint $table) {
-            $table->dropColumn('sequence');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
         });
     }
 };
