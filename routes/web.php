@@ -1,19 +1,32 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentActivityController;
+use App\Models\ReadingMaterial;
+use Illuminate\Support\Facades\Route;
+
+// === USE STATEMENTS UNTUK ADMIN ===
 use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\HotsActivityController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
 use App\Http\Controllers\Admin\StudentProgressController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\StudentActivityController;
-use App\Http\Controllers\ReadingMaterialViewController;
-use App\Models\ReadingMaterial; // <-- Ditambahkan
 use App\Http\Middleware\AdminMiddleware;
-use Illuminate\Support\Facades\Route;
 
-// ... (kode route lainnya)
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
@@ -28,11 +41,11 @@ Route::middleware('auth')->group(function () {
 
 // ROUTES UNTUK SISWA
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Route untuk menampilkan detail materi (diperbaiki)
-    Route::get('/materials/{readingMaterial}', [ReadingMaterialViewController::class, 'show'])
-        ->name('student.materials.show');
+    Route::get('/materials/{readingMaterial}', function (ReadingMaterial $readingMaterial) {
+        $readingMaterial->load('activities');
+        return view('student.materials.show', ['material' => $readingMaterial]);
+    })->name('student.materials.show');
 
-    // Route baru untuk halaman aktivitas siswa
     Route::get('/activities', [StudentActivityController::class, 'index'])->name('student.activities.index');
 });
 
@@ -40,31 +53,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/auth.php';
 
 
-// == HALAMAN ADMIN / CONTENT MANAGER ==
-// Semua route di sini akan memiliki prefix '/admin' dan nama 'admin.'
-// Contoh: URL /admin/materials akan memiliki nama route 'admin.materials.index'
+// ADMIN ROUTES
 Route::prefix('admin')
-    ->middleware(['auth', AdminMiddleware::class]) // <-- Perbaikan ada di sini
+    ->middleware(['auth', AdminMiddleware::class])
     ->name('admin.')
     ->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         
-        // Route untuk mengelola Materi Bacaan
-        Route::resource('materials', ReadingMaterialController::class); // <-- Ditambahkan
+        // Reading Materials
+        Route::resource('/materials', ReadingMaterialController::class);
 
-        // Route untuk mengelola Genre
-        Route::resource('genres', GenreController::class); // <-- Ditambahkan
+        // Genres
+        Route::resource('/genres', GenreController::class)->except(['edit', 'update', 'show']);
 
-        // Route untuk mengelola Bab
-        Route::resource('chapters', ChapterController::class); // <-- Ditambahkan
+        // Chapters
+        Route::resource('/chapters', ChapterController::class)->except(['show']);
 
-        // Route untuk mengelola Aktivitas HOTS (Nested & Shallow)
-        // Diletakkan di sini karena merupakan bagian dari manajemen admin
-        Route::resource('materials.activities', HotsActivityController::class)->shallow(); // <-- Ditambahkan
-
-        // Route untuk melihat semua aktivitas secara global
-        Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all'); // <-- Ditambahkan
-
-        // Route untuk memonitoring progres siswa
-        Route::resource('students', StudentProgressController::class)->only(['index', 'show']); // <-- Ditambahkan
-
+        // Hots Activities
+        Route::prefix('activities')->name('activities.')->group(function () {
+            Route::get('/', [HotsActivityController::class, 'all'])->name('all');
+            Route::get('/create/{materialId}', [HotsActivityController::class, 'create'])->name('create');
+            Route::post('/', [HotsActivityController::class, 'store'])->name('store');
+        });
+        
+        // Student Progress
+        Route::resource('/students', StudentProgressController::class)->only(['index', 'show']);
     });
