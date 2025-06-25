@@ -13,17 +13,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Membuat Admin
+        // Membuat pengguna default
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@readinghub.com',
-            'password' => Hash::make('password'), // Ganti dengan password yang aman
+            'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
-
-        // Membuat beberapa user siswa (opsional)
-        User::factory(10)->create([
-            'role' => 'student',
+        User::factory(10)->create(['role' => 'student']);
+        
+        // Memanggil seeder untuk Genre dan Chapter
+        $this->call([
+            GenreSeeder::class,
+            ChapterSeeder::class,
         ]);
     }
 }

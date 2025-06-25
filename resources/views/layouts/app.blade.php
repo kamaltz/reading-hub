@@ -25,45 +25,55 @@
                         </a>
                     </div>
                     <nav class="flex-grow p-4 space-y-2">
-                        {{-- Link ke Dashboard --}}
+                        {{-- ================================================= --}}
+                        {{--                   MENU DINAMIS DIMULAI DI SINI                 --}}
+                        {{-- ================================================= --}}
+
+                        {{-- Link ke Dashboard (Untuk Semua Role) --}}
                         <a href="{{ route('dashboard') }}"
-                           class="flex items-center rounded-lg px-4 py-2 transition-colors
-                                  {{ request()->routeIs('dashboard') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                            <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1V10a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1h2z"/></svg>
+                           class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                           <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1V10a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1h2z"/></svg>
                             <span>Dashboard</span>
                         </a>
 
-                        {{-- Link ke Manajemen Materi --}}
-                        <a href="{{ route('admin.materials.index') }}"
-                           class="flex items-center rounded-lg px-4 py-2 transition-colors
-                                  {{ request()->routeIs('admin.materials.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                            <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"/></svg>
-                            <span>Materi Bacaan</span>
-                        </a>
+                        @if(Auth::check())
+                            {{-- Menu Khusus Admin --}}
+                            @if (Auth::user()->isAdmin())
+                                <a href="{{ route('admin.materials.index') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.materials.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"/></svg>
+                                    <span>Materi Bacaan</span>
+                                </a>
+                                <a href="{{ route('admin.genres.index') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.genres.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm10 14h.01M17 11h5a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2v-5a2 2 0 012-2z"/></svg>
+                                    <span>Genre</span>
+                                </a>
+                                <a href="{{ route('admin.chapters.index') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.chapters.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                    <span>Bab</span>
+                                </a>
+                                <a href="{{ route('admin.activities.all') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.activities.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                                    <span>Aktivitas</span>
+                                </a>
+                                <a href="{{ route('admin.students.index') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.students.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197" /></svg>
+                                    <span>Siswa</span>
+                                </a>
 
-                        {{-- Link ke Manajemen Genre --}}
-                        <a href="{{ route('admin.genres.index') }}"
-                           class="flex items-center rounded-lg px-4 py-2 transition-colors
-                                  {{ request()->routeIs('admin.genres.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                            <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm10 14h.01M17 11h5a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2v-5a2 2 0 012-2z"/></svg>
-                            <span>Genre</span>
-                        </a>
-
-                        {{-- Link ke Manajemen Bab --}}
-                        <a href="{{ route('admin.chapters.index') }}"
-                           class="flex items-center rounded-lg px-4 py-2 transition-colors
-                                  {{ request()->routeIs('admin.chapters.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                            <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            <span>Bab</span>
-                        </a>
-
-                        {{-- Link ke Manajemen Aktivitas --}}
-                        <a href="{{ route('admin.activities.all') }}"
-                           class="flex items-center rounded-lg px-4 py-2 transition-colors
-                                  {{ request()->routeIs('admin.activities.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                            <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-                            <span>Aktivitas</span>
-                        </a>
+                            {{-- Menu Khusus Siswa --}}
+                            @else
+                                {{-- <a href="{{ route('student.activities.index') }}"
+                                   class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('student.activities.index') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                   <svg class="mr-3 w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                                    <span>Aktivitas</span>
+                                </a> --}}
+                            @endif
+                        @endif
 
                     </nav>
                     <div class="p-4 border-t border-gray-800">
@@ -84,7 +94,7 @@
                     <!-- Top Bar -->
                     <div class="flex justify-end items-center p-4">
                          <a href="{{ route('profile.edit') }}" class="flex items-center focus:outline-none">
-                            <span class="mr-2 text-white">{{ Auth::user()->name }}</span>
+                            <span class="mr-2 text-white">{{ Auth::user()->name ?? 'Guest' }}</span>
                             <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                        </a>
                     </div>

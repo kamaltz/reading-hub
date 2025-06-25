@@ -3,45 +3,42 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ReadingMaterial;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class StudentProgressController extends Controller
 {
     /**
-     * Menampilkan daftar semua siswa dengan ringkasan progres.
+     * Menampilkan daftar semua siswa beserta rangkuman progresnya.
      */
     public function index()
     {
-        // Ambil semua user dengan role 'student'
         $students = User::where('role', 'student')
-                        ->withCount('hotsActivityAnswers') // Menghitung total jawaban
-                        ->withCount(['hotsActivityAnswers as correct_answers_count' => function ($query) {
+                        ->withCount(['answers as correct_answers_count' => function ($query) {
                             $query->where('is_correct', true);
-                        }]) // Menghitung jawaban benar
+                        }])
+                        ->withCount('answers as attempted_answers_count')
                         ->latest()
-                        ->paginate(10);
-
+                        ->paginate(15);
+        
         return view('admin.students.index', compact('students'));
     }
 
     /**
-     * Menampilkan detail progres untuk siswa tertentu.
+     * Menampilkan progres detail dari seorang siswa.
      */
     public function show(User $student)
     {
-        // Pastikan user yang diakses adalah siswa
-        abort_if(!$student->isStudent(), 404);
-
-        // Memuat jumlah jawaban secara efisien untuk ditampilkan di ringkasan
-        $student->loadCount([
-            'hotsActivityAnswers',
-            'hotsActivityAnswers as correct_answers_count' => function ($query) {
-                $query->where('is_correct', true);
-            }
-        ]);
-
-        $answers = $student->hotsActivityAnswers()->with('hotsActivity.readingMaterial')->latest()->paginate(15);
-        return view('admin.students.show', compact('student', 'answers'));
+        // Ambil semua materi beserta aktivitasnya
+        $materials = ReadingMaterial::with('activities')->get();
+        
+        // Ambil semua jawaban siswa untuk di-mapping di view
+        $studentAnswers = $student->answers()
+                                  ->with('hotsActivity')
+                                  ->get()
+                                  ->keyBy('hots_activity_id');
+        
+        return view('admin.students.show', compact('student', 'materials', 'studentAnswers'));
     }
 }

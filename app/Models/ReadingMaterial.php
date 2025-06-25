@@ -4,26 +4,46 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+// PERBAIKAN: Menambahkan 'use' statement untuk model yang direferensikan.
+use App\Models\Chapter;
+use App\Models\Genre;
+use App\Models\HotsActivity;
 
 class ReadingMaterial extends Model
 {
     use HasFactory;
 
-    // Pastikan ada titik koma di akhir baris ini
-    protected $fillable = ['chapter_id', 'genre_id', 'title', 'content', 'illustration_path'];
+    protected $fillable = [
+        'title',
+        'description',
+        'chapter_id',
+        'genre_id',
+    ];
 
-    public function chapter()
+    /**
+     * Relasi ke model Chapter.
+     */
+    public function chapter(): BelongsTo
     {
         return $this->belongsTo(Chapter::class);
     }
 
-    public function genre()
+    /**
+     * Relasi ke model Genre.
+     */
+    public function genre(): BelongsTo
     {
         return $this->belongsTo(Genre::class);
     }
 
-    public function hotsActivities()
-{
-    return $this->hasMany(HotsActivity::class);
-}
+    /**
+     * Relasi ke model HotsActivity.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(HotsActivity::class, 'reading_material_id');
+    }
 }

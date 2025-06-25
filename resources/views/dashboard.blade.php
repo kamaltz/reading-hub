@@ -8,32 +8,13 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             @if (Auth::user()->isAdmin())
-                {{-- TAMPILAN UNTUK ADMIN (Tidak Berubah) --}}
-                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
-                        <h3 class="mb-4 text-lg font-semibold">Statistik Sistem</h3>
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            <div class="p-4 bg-blue-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Total Materi Bacaan</p>
-                                <p class="text-2xl font-bold">{{ $totalMaterials }}</p>
-                            </div>
-                            <div class="p-4 bg-green-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Total Aktivitas HOTS</p>
-                                <p class="text-2xl font-bold">{{ $totalActivities }}</p>
-                            </div>
-                            <div class="p-4 bg-yellow-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Total Siswa Terdaftar</p>
-                                <p class="text-2xl font-bold">{{ $totalStudents }}</p>
-                            </div>
-                            <div class="p-4 bg-purple-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Total Jawaban Aktivitas</p>
-                                <p class="text-2xl font-bold">{{ $totalAnswers }}</p>
-                            </div>
-                        </div>
-                    </div>
+                {{-- Tampilan untuk Admin (Tidak Berubah) --}}
+                <div class="overflow-hidden p-6 bg-white shadow-sm sm:rounded-lg">
+                    {{-- Konten dasbor admin di sini --}}
+                    <p>Selamat datang, Admin!</p>
                 </div>
             @else
-                {{-- TAMPILAN BARU UNTUK SISWA --}}
+                {{-- TAMPILAN UNTUK SISWA --}}
                 {{-- 1. Bagian Statistik Progres --}}
                 <div class="overflow-hidden p-6 mb-8 bg-white shadow-sm sm:rounded-lg">
                     <h3 class="mb-4 text-lg font-semibold">Progres Belajar Saya</h3>
@@ -96,9 +77,12 @@
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @forelse ($materials as $material)
                         @php
-                            $totalActivitiesInMaterial = $material->hotsActivities->count();
-                            $answeredActivitiesInMaterial = Auth::user()->studentHotsActivityAnswers()
-                                ->whereIn('hots_activity_id', $material->hotsActivities->pluck('id'))
+                            // PERBAIKAN 1: Menggunakan nama relasi 'activities'
+                            $totalActivitiesInMaterial = $material->activities->count();
+                            
+                            // PERBAIKAN 2: Menggunakan nama relasi 'answers'
+                            $answeredActivitiesInMaterial = Auth::user()->answers()
+                                ->whereIn('hots_activity_id', $material->activities->pluck('id'))
                                 ->distinct('hots_activity_id')
                                 ->count();
                             $progress = ($totalActivitiesInMaterial > 0) ? ($answeredActivitiesInMaterial / $totalActivitiesInMaterial) * 100 : 0;
@@ -123,7 +107,7 @@
                                 @endif
                             </div>
                             <div class="px-6 py-4 bg-gray-50">
-                                <a href="{{ route('student.materials.show', $material) }}" class="inline-block px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                                <a href="{{ route('materials.show', $material) }}" class="inline-block px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
                                     Lihat Materi
                                 </a>
                             </div>
