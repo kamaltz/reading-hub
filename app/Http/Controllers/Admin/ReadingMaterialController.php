@@ -32,19 +32,33 @@ class ReadingMaterialController extends Controller
     /**
      * Menyimpan materi baru ke database.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'chapter_id' => 'required|exists:chapters,id',
-            'genre_id' => 'required|exists:genres,id',
-        ]);
+public function store(Request $request)
+{
+    // Validasi input, termasuk 'content'
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'chapter_id' => 'required|exists:chapters,id',
+        'genre_id' => 'required|exists:genres,id',
+        'illustration' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ]);
 
-        ReadingMaterial::create($validated);
-
-        return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil ditambahkan.');
+    $illustrationPath = null;
+    if ($request->hasFile('illustration')) {
+        $illustrationPath = $request->file('illustration')->store('illustrations', 'public');
     }
+
+    // Simpan ke database, PASTIKAN 'content' ADA DI SINI
+    ReadingMaterial::create([
+        'title' => $request->title,
+        'content' => $request->content, // <-- INI YANG PALING PENTING
+        'chapter_id' => $request->chapter_id,
+        'genre_id' => $request->genre_id,
+        'illustration_path' => $illustrationPath,
+    ]);
+
+    return redirect()->route('admin.materials.index')->with('success', 'Reading material created successfully.');
+}
 
     /**
      * Menampilkan detail satu materi beserta aktivitasnya.
@@ -90,12 +104,19 @@ class ReadingMaterialController extends Controller
     /**
      * Menghapus materi dari database.
      */
-    public function destroy(ReadingMaterial $material)
-    {
-        // Sebaiknya tambahkan juga logika untuk menghapus aktivitas terkait
-        // atau menangani relasi sebelum menghapus materi.
-        $material->delete();
-        
-        return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dihapus.');
+   public function destroy(ReadingMaterial $material)
+{
+    // Hapus semua aktivitas yang terkait dengan materi ini
+    $material->activities()->delete();
+
+    // Hapus file ilustrasi jika ada
+    if ($material->illustration_path) {
+        Storage::disk('public')->delete($material->illustration_path);
     }
+
+    // Hapus materi itu sendiri
+    $material->delete();
+
+    return redirect()->route('admin.materials.index')->with('success', 'Reading material and its activities deleted successfully.');
+}
 }
