@@ -21,7 +21,7 @@ class ReadingMaterialViewController extends Controller
         // Ambil semua jawaban siswa untuk aktivitas di materi ini,
         // lalu jadikan activity_id sebagai key agar mudah dicari di view.
         $userAnswers = Auth::user()
-            ->hotsActivityAnswers()
+            ->studentHotsActivityAnswers()
             ->whereIn('hots_activity_id', $activities->pluck('id'))
             ->get()
             ->keyBy('hots_activity_id');

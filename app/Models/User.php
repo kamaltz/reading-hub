@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\StudentHotsActivityAnswer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'student_id', // Tambahkan ini
+        'role',
     ];
 
     /**
@@ -48,21 +48,20 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user has an admin role.
-     *
-     * @return bool
+     * Mengecek apakah user adalah admin.
      */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
-
     /**
-     * Mendefinisikan relasi one-to-many ke jawaban aktivitas siswa.
+     * Mendefinisikan relasi bahwa seorang User memiliki banyak Jawaban Aktivitas HOTS.
      */
-    public function hotsActivityAnswers(): HasMany
+    public function answers(): HasMany
     {
+        // PERBAIKAN: Menggunakan foreign key 'user_id' yang benar sesuai standar Laravel.
+        // Laravel secara otomatis akan mencari kolom 'user_id' jika parameter kedua dikosongkan.
         return $this->hasMany(StudentHotsActivityAnswer::class);
     }
 }

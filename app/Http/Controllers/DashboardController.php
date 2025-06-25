@@ -2,55 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Chapter;
+use App\Models\Genre;
 use App\Models\HotsActivity;
 use App\Models\ReadingMaterial;
 use App\Models\StudentHotsActivityAnswer;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     /**
-     * Display the appropriate dashboard for the authenticated user.
-     *
-     * @return \Illuminate\View\View
+     * Handle the incoming request.
      */
-    public function index(): View
+    public function __invoke(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
-        $viewData = [];
 
         if ($user->isAdmin()) {
-            // Data for Admin Dashboard
-            $viewData = [
+            // Logika untuk Admin
+            return view('dashboard', [
                 'totalMaterials' => ReadingMaterial::count(),
                 'totalActivities' => HotsActivity::count(),
                 'totalStudents' => User::where('role', 'student')->count(),
                 'totalAnswers' => StudentHotsActivityAnswer::count(),
-            ];
+            ]);
         } else {
-            // Data for Student Dashboard
-            $userId = $user->id;
-
-            // Total activities attempted by the student
-            $totalAttemptedActivities = StudentHotsActivityAnswer::where('user_id', $userId)->count();
-
-            // Total activities answered correctly by the student
-            $completedActivities = StudentHotsActivityAnswer::where('user_id', $userId)
-                                                            ->where('is_correct', true)
-                                                            ->count();
-
-            // Total number of all available activities in the system
+            // Logika untuk Siswa
+            $totalAttemptedActivities = $user->answers()->distinct('hots_activity_id')->count();
+            $completedActivities = $user->answers()->where('is_correct', true)->distinct('hots_activity_id')->count();
             $totalAvailableActivities = HotsActivity::count();
 
-            $viewData = [
+            // Ambil data untuk filter
+            $chapters = Chapter::orderBy('title')->get(); // <-- INI DIA PERBAIKANNYA
+            $genres = Genre::orderBy('name')->get();
+
+            // Query dasar untuk materi
+            $materialsQuery = ReadingMaterial::query();
+
+            // Terapkan filter jika ada
+            if ($request->filled('chapter_id')) {
+                $materialsQuery->where('chapter_id', $request->chapter_id);
+            }
+
+            if ($request->filled('genre_id')) {
+                $materialsQuery->where('genre_id', $request->genre_id);
+            }
+            
+            // Ambil hasil query
+            $materials = $materialsQuery->with('activities')->get();
+
+            return view('dashboard', [
                 'totalAttemptedActivities' => $totalAttemptedActivities,
                 'completedActivities' => $completedActivities,
                 'totalAvailableActivities' => $totalAvailableActivities,
-            ];
+                'materials' => $materials,
+                'chapters' => $chapters,
+                'genres' => $genres,
+            ]);
         }
-
-        return view('dashboard', $viewData);
     }
 }

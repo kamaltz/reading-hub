@@ -1,45 +1,43 @@
 <?php
 
-// Semua 'use' statement dikumpulkan di atas agar rapi
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomepageController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReadingMaterialViewController;
 use App\Http\Controllers\Admin\ChapterController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\GenreController;
-use App\Http\Controllers\StudentActivityController;
 use App\Http\Controllers\Admin\HotsActivityController;
-use App\Http\Controllers\Admin\StudentProgressController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
+use App\Http\Controllers\Admin\StudentProgressController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentActivityController;
+use App\Http\Controllers\ReadingMaterialViewController;
+use App\Models\ReadingMaterial; // <-- Ditambahkan
 use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Di sini Anda bisa mendaftarkan route untuk aplikasi web Anda.
-|
-*/
+// ... (kode route lainnya)
 
-// == HALAMAN PUBLIK / UNTUK SISWA ==
-Route::get('/', [HomepageController::class, 'index'])->name('home');
-
-// == HALAMAN PENGGUNA TERAUTENTIKASI (SISWA/USER BIASA) ==
-// Route dashboard sekarang akan memanggil DashboardController@index
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // Route untuk menampilkan detail materi (hanya untuk user yang sudah login)
-    Route::get('/materials/{material}', [ReadingMaterialViewController::class, 'show'])->name('materials.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Route untuk siswa mengirimkan jawaban aktivitas
-    Route::post('/activities/{activity}/answer', [StudentActivityController::class, 'store'])->name('activities.answer');
 });
+
+
+// ROUTES UNTUK SISWA
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Route untuk menampilkan detail materi (diperbaiki)
+    Route::get('/materials/{readingMaterial}', [ReadingMaterialViewController::class, 'show'])
+        ->name('student.materials.show');
+
+    // Route baru untuk halaman aktivitas siswa
+    Route::get('/activities', [StudentActivityController::class, 'index'])->name('student.activities.index');
+});
+
+
+require __DIR__.'/auth.php';
 
 
 // == HALAMAN ADMIN / CONTENT MANAGER ==
@@ -51,26 +49,22 @@ Route::prefix('admin')
     ->group(function () {
         
         // Route untuk mengelola Materi Bacaan
-        Route::resource('materials', ReadingMaterialController::class);
+        Route::resource('materials', ReadingMaterialController::class); // <-- Ditambahkan
 
         // Route untuk mengelola Genre
-        Route::resource('genres', GenreController::class);
+        Route::resource('genres', GenreController::class); // <-- Ditambahkan
 
         // Route untuk mengelola Bab
-        Route::resource('chapters', ChapterController::class);
+        Route::resource('chapters', ChapterController::class); // <-- Ditambahkan
 
         // Route untuk mengelola Aktivitas HOTS (Nested & Shallow)
         // Diletakkan di sini karena merupakan bagian dari manajemen admin
-        Route::resource('materials.activities', HotsActivityController::class)->shallow();
+        Route::resource('materials.activities', HotsActivityController::class)->shallow(); // <-- Ditambahkan
 
         // Route untuk melihat semua aktivitas secara global
-        Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
+        Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all'); // <-- Ditambahkan
 
         // Route untuk memonitoring progres siswa
-        Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
+        Route::resource('students', StudentProgressController::class)->only(['index', 'show']); // <-- Ditambahkan
 
     });
-
-
-// File ini berisi route untuk otentikasi (login, register, dll)
-require __DIR__.'/auth.php';
