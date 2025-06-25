@@ -12,6 +12,7 @@ use App\Http\Controllers\StudentActivityController;
 use App\Http\Controllers\Admin\HotsActivityController;
 use App\Http\Controllers\Admin\StudentProgressController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
+use App\Http\Middleware\AdminMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
 // Semua route di sini akan memiliki prefix '/admin' dan nama 'admin.'
 // Contoh: URL /admin/materials akan memiliki nama route 'admin.materials.index'
 Route::prefix('admin')
-    ->middleware(['auth', 'admin']) // Pastikan hanya user admin yang bisa akses
+    ->middleware(['auth', AdminMiddleware::class]) // <-- Perbaikan ada di sini
     ->name('admin.')
     ->group(function () {
         

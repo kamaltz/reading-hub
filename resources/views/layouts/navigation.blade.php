@@ -17,8 +17,12 @@
                     </x-nav-link>
 
                     @if(Auth::user()->isAdmin())
-                        <x-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*') || request()->routeIs('admin.activities.*')">
+                        <x-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*')">
                             Materi Bacaan
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.activities.all')" :active="request()->routeIs('admin.activities.*')">
+                            Aktivitas
                         </x-nav-link>
                         <x-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')">
                             Genre

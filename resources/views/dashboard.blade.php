@@ -10,6 +10,7 @@
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if (Auth::user()->isAdmin())
+                        {{-- Tampilan untuk Admin --}}
                         <h3 class="mb-4 text-lg font-semibold">Statistik Sistem</h3>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <div class="p-4 bg-blue-100 rounded-lg shadow">
@@ -30,18 +31,19 @@
                             </div>
                         </div>
                     @else
-                        <h3 class="mb-4 text-lg font-semibold">My Learning Progress</h3>
+                        {{-- Tampilan untuk Siswa --}}
+                        <h3 class="mb-4 text-lg font-semibold">Progres Belajar Saya</h3>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                             <div class="p-4 bg-green-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Attempted Activities</p>
+                                <p class="text-sm text-gray-600">Aktivitas yang Dicoba</p>
                                 <p class="text-2xl font-bold">{{ $totalAttemptedActivities }}</p>
                             </div>
                             <div class="p-4 bg-blue-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Correctly Answered</p>
+                                <p class="text-sm text-gray-600">Jawaban Benar</p>
                                 <p class="text-2xl font-bold">{{ $completedActivities }}</p>
                             </div>
                             <div class="p-4 bg-yellow-100 rounded-lg shadow">
-                                <p class="text-sm text-gray-600">Total Available Activities</p>
+                                <p class="text-sm text-gray-600">Total Aktivitas Tersedia</p>
                                 <p class="text-2xl font-bold">{{ $totalAvailableActivities }}</p>
                             </div>
                         </div>
