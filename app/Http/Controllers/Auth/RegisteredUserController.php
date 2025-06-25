@@ -32,12 +32,14 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'student_id' => ['nullable', 'string', 'max:255', 'unique:'.User::class], // Validasi untuk NIK/ID
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'student_id' => $request->student_id, // Simpan NIK/ID
             'password' => Hash::make($request->password),
         ]);
 

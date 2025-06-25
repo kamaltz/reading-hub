@@ -86,19 +86,21 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <!-- Responsive Admin Links -->
-            <x-responsive-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*') || request()->routeIs('admin.activities.*')">
-                Materi Bacaan
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')">
-                Genre
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.chapters.index')" :active="request()->routeIs('admin.chapters.*')">
-                Bab
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
-                Progres Siswa
-            </x-responsive-nav-link>
+            @if(Auth::user()->isAdmin())
+                <!-- Responsive Admin Links -->
+                <x-responsive-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*') || request()->routeIs('admin.activities.*')">
+                    Materi Bacaan
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')">
+                    Genre
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.chapters.index')" :active="request()->routeIs('admin.chapters.*')">
+                    Bab
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
+                    Progres Siswa
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

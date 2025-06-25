@@ -8,6 +8,7 @@ use App\Http\Controllers\ReadingMaterialViewController;
 use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\GenreController;
+use App\Http\Controllers\StudentActivityController;
 use App\Http\Controllers\Admin\HotsActivityController;
 use App\Http\Controllers\Admin\StudentProgressController;
 use App\Http\Controllers\Admin\ReadingMaterialController;
@@ -24,20 +25,19 @@ use App\Http\Controllers\Admin\ReadingMaterialController;
 // == HALAMAN PUBLIK / UNTUK SISWA ==
 Route::get('/', [HomepageController::class, 'index'])->name('home');
 
-// Route untuk menampilkan detail materi kepada siswa
-Route::get('/materials/{material}', [ReadingMaterialViewController::class, 'show'])->name('materials.show');
-
-
 // == HALAMAN PENGGUNA TERAUTENTIKASI (SISWA/USER BIASA) ==
-
-// BARIS INI YANG DIUBAH
 // Route dashboard sekarang akan memanggil DashboardController@index
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Route untuk menampilkan detail materi (hanya untuk user yang sudah login)
+    Route::get('/materials/{material}', [ReadingMaterialViewController::class, 'show'])->name('materials.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Route untuk siswa mengirimkan jawaban aktivitas
+    Route::post('/activities/{activity}/answer', [StudentActivityController::class, 'store'])->name('activities.answer');
 });
 
 
@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 // Semua route di sini akan memiliki prefix '/admin' dan nama 'admin.'
 // Contoh: URL /admin/materials akan memiliki nama route 'admin.materials.index'
 Route::prefix('admin')
-    ->middleware(['auth']) // Pastikan hanya user yang login bisa akses
+    ->middleware(['auth', 'admin']) // Pastikan hanya user admin yang bisa akses
     ->name('admin.')
     ->group(function () {
         
