@@ -15,7 +15,7 @@ class HotsActivityController extends Controller
     public function all()
     {
         // Menggunakan with() untuk eager loading agar lebih efisien
-        $activities = HotsActivity::with('readingMaterial')->latest()->get();
+        $activities = HotsActivity::with('readingMaterial')->latest()->paginate(15);
         return view('admin.activities.all', compact('activities'));
     }
 
@@ -32,20 +32,39 @@ class HotsActivityController extends Controller
     /**
      * Menyimpan aktivitas baru ke database.
      */
-    public function store(Request $request)
+    public function store(Request $request, ReadingMaterial $material)
     {
         // 1. Validasi input dari form
         $validated = $request->validate([
-            'question' => 'required|string|min:5',
-            'correct_answer' => 'required|string',
-            'reading_material_id' => 'required|exists:reading_materials,id' // Memastikan materi ada
+            'question' => 'required|string|min:10',
+            'type' => 'required|in:essay,multiple_choice',
+            // Opsi hanya wajib jika tipe adalah pilihan ganda
+            'options' => 'required_if:type,multiple_choice|array|size:4',
+            'options.*' => 'required_if:type,multiple_choice|string|max:255',
+            // Kunci jawaban hanya wajib jika tipe adalah pilihan ganda
+            'answer_key' => 'required_if:type,multiple_choice|in:A,B,C,D',
         ]);
 
-        // 2. Membuat aktivitas baru menggunakan data yang sudah divalidasi
-        HotsActivity::create($validated);
+        // 2. Menyiapkan data untuk disimpan
+        $data = [
+            'reading_material_id' => $material->id,
+            'question' => $validated['question'],
+            'type' => $validated['type'],
+            'options' => null,
+            'answer_key' => null,
+        ];
 
-        // 3. Kembali ke halaman detail materi dengan pesan sukses
-        return redirect()->route('admin.materials.show', $validated['reading_material_id'])
+        if ($validated['type'] === 'multiple_choice') {
+            $data['options'] = $validated['options'];
+            $data['answer_key'] = $validated['answer_key'];
+        }
+
+        // 3. Membuat aktivitas baru
+        // Pastikan model HotsActivity memiliki 'options' di $casts dan semua field di $fillable
+        HotsActivity::create($data);
+
+        // 4. Kembali ke halaman detail materi dengan pesan sukses
+        return redirect()->route('admin.materials.show', $material)
                          ->with('success', 'Aktivitas baru berhasil ditambahkan.');
     }
 }

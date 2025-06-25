@@ -50,15 +50,15 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
         
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-        
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');        
         Route::resource('materials', ReadingMaterialController::class);
         Route::resource('genres', GenreController::class);
         Route::resource('chapters', ChapterController::class);
         
         Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
-        Route::get('/activities/create/{material}', [HotsActivityController::class, 'create'])->name('activities.create');
-        Route::post('/activities', [HotsActivityController::class, 'store'])->name('activities.store');
+        // Nested routes for activities under a specific material
+        Route::get('/materials/{material}/activities/create', [HotsActivityController::class, 'create'])->name('activities.create');
+        Route::post('/materials/{material}/activities', [HotsActivityController::class, 'store'])->name('activities.store');
         
         Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
     });
