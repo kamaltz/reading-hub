@@ -21,9 +21,13 @@
                                 <td class="px-6 py-4 text-sm text-white whitespace-nowrap">{{ Str::limit($activity->question, 60) }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-400 whitespace-nowrap">{{ $activity->type == 'multiple_choice' ? 'Pilihan Ganda' : 'Essay' }}</td>
                                 <td class="px-6 py-4 text-sm text-indigo-400 whitespace-nowrap hover:text-indigo-300">
-                                    <a href="{{ route('admin.materials.edit', $activity->readingMaterial) }}">
-                                        {{ Str::limit($activity->readingMaterial->title, 40) }}
-                                    </a>
+                                @if ($activity->readingMaterial)
+        <a href="{{ route('admin.materials.edit', $activity->readingMaterial) }}">
+            {{ Str::limit($activity->readingMaterial->title, 40) }}
+        </a>
+    @else
+        <span class="italic text-gray-400">No Material Linked</span>
+    @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                                     <a href="{{ route('admin.activities.edit', $activity) }}" class="text-indigo-400 hover:text-indigo-300">Edit</a>

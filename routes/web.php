@@ -61,6 +61,11 @@ Route::prefix('admin')
         Route::post('/materials/{material}/activities', [HotsActivityController::class, 'store'])->name('activities.store');
         
         Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
+
+        // Routes for editing, updating, and deleting a specific activity
+        Route::get('activities/{activity}/edit', [HotsActivityController::class, 'edit'])->name('activities.edit');
+        Route::put('activities/{activity}', [HotsActivityController::class, 'update'])->name('activities.update');
+        Route::delete('activities/{activity}', [HotsActivityController::class, 'destroy'])->name('activities.destroy');
     });
 
 require __DIR__.'/auth.php';
