@@ -44,28 +44,36 @@ Route::middleware('auth')->group(function () {
 });
 
 
+
 // == HALAMAN ADMIN / CONTENT MANAGER ==
 Route::prefix('admin')
     ->middleware(['auth', AdminMiddleware::class])
     ->name('admin.')
     ->group(function () {
         
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');        
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::resource('materials', ReadingMaterialController::class);
         Route::resource('genres', GenreController::class);
         Route::resource('chapters', ChapterController::class);
         
         Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
-        // Nested routes for activities under a specific material
+        
+        // Rute untuk membuat aktivitas baru di bawah materi tertentu
         Route::get('/materials/{material}/activities/create', [HotsActivityController::class, 'create'])->name('activities.create');
-        Route::post('/materials/{material}/activities', [HotsActivityController::class, 'store'])->name('activities.store');
+        
+        // # PERBAIKAN 1: Mengubah rute 'store' menjadi non-nested agar lebih sederhana
+        // Rute ini sekarang akan menjadi '/admin/activities'
+        Route::post('/activities', [HotsActivityController::class, 'store'])->name('activities.store');
         
         Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
 
-        // Routes for editing, updating, and deleting a specific activity
+        // Rute untuk mengelola aktivitas individual
         Route::get('activities/{activity}/edit', [HotsActivityController::class, 'edit'])->name('activities.edit');
         Route::put('activities/{activity}', [HotsActivityController::class, 'update'])->name('activities.update');
         Route::delete('activities/{activity}', [HotsActivityController::class, 'destroy'])->name('activities.destroy');
+        
+        // # PERBAIKAN 2: Memindahkan dan memperbaiki rute 'duplicate' dan 'reorder' ke sini
+        Route::post('activities/{activity}/duplicate', [HotsActivityController::class, 'duplicate'])->name('activities.duplicate');
+        Route::post('activities/reorder', [HotsActivityController::class, 'reorder'])->name('activities.reorder');
     });
-
 require __DIR__.'/auth.php';

@@ -32,41 +32,32 @@ class HotsActivityController extends Controller
     /**
      * Menyimpan aktivitas baru ke database.
      */
-    public function store(Request $request, ReadingMaterial $material)
-    {
-        // 1. Validasi input dari form
-        $validated = $request->validate([
-            'question' => 'required|string|min:10',
-            'type' => 'required|in:essay,multiple_choice',
-            // Opsi hanya wajib jika tipe adalah pilihan ganda
-            'options' => 'required_if:type,multiple_choice|array|size:4',
-            'options.*' => 'required_if:type,multiple_choice|string|max:255',
-            // Kunci jawaban hanya wajib jika tipe adalah pilihan ganda
-            'answer_key' => 'required_if:type,multiple_choice|in:A,B,C,D',
-        ]);
+    public function store(Request $request)
+{
+    // 1. Validasi data yang masuk dari form
+    $validated = $request->validate([
+        'reading_material_id' => 'required|exists:reading_materials,id',
+        'type' => 'required|in:essay,multiple_choice,true_false', // Sesuaikan dengan tipe yang ada
+        'question' => 'required|string|min:5',
+        // Kunci jawaban hanya wajib diisi jika tipe BUKAN 'essay'
+        'correct_answer' => 'required_unless:type,essay|nullable|string',
+        'options' => 'nullable|array', // Validasi untuk pilihan ganda
+    ]);
 
-        // 2. Menyiapkan data untuk disimpan
-        $data = [
-            'reading_material_id' => $material->id,
-            'question' => $validated['question'],
-            'type' => $validated['type'],
-            'options' => null,
-            'answer_key' => null,
-        ];
+    // 2. Buat aktivitas baru menggunakan data yang sudah divalidasi
+    // Kita tidak bisa langsung menggunakan $validated karena 'options' perlu penanganan khusus
+    HotsActivity::create([
+        'reading_material_id' => $validated['reading_material_id'],
+        'type' => $validated['type'],
+        'question' => $validated['question'],
+        'correct_answer' => $validated['correct_answer'] ?? null, // Beri nilai null jika kosong
+        'options' => $request->input('options'), // Ambil options langsung dari request
+    ]);
 
-        if ($validated['type'] === 'multiple_choice') {
-            $data['options'] = $validated['options'];
-            $data['answer_key'] = $validated['answer_key'];
-        }
-
-        // 3. Membuat aktivitas baru
-        // Pastikan model HotsActivity memiliki 'options' di $casts dan semua field di $fillable
-        HotsActivity::create($data);
-
-        // 4. Kembali ke halaman detail materi dengan pesan sukses
-        return redirect()->route('admin.materials.show', $material)
-                         ->with('success', 'Aktivitas baru berhasil ditambahkan.');
-    }
+    // 3. Kembali ke halaman detail materi dengan pesan sukses
+    return redirect()->route('admin.materials.show', $validated['reading_material_id'])
+                     ->with('success', 'Aktivitas baru berhasil ditambahkan.');
+}
 
 
         /**
@@ -134,5 +125,30 @@ class HotsActivityController extends Controller
         return redirect()->route('admin.materials.show', $materialId)
                     ->with('success', 'Aktivitas berhasil dihapus.');
     }
+
+    public function duplicate(HotsActivity $activity)
+{
+    // Gunakan method replicate() dari Eloquent untuk menyalin model
+    $newActivity = $activity->replicate();
+
+    // Ubah sedikit pertanyaannya agar tidak sama persis
+    $newActivity->question = $activity->question . ' (Salinan)';
+
+    // Simpan model baru ke database
+    $newActivity->save();
+
+    return back()->with('success', 'Aktivitas berhasil diduplikasi.');
+}
+
+public function reorder(Request $request)
+{
+    $request->validate(['ids' => 'required|array']);
+
+    foreach ($request->ids as $index => $id) {
+        HotsActivity::where('id', $id)->update(['position' => $index + 1]);
+    }
+
+    return response()->json(['status' => 'success']);
+}
 
 }
