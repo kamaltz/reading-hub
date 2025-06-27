@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HotsActivity extends Model
 {
@@ -14,27 +15,31 @@ class HotsActivity extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['question', 'type', 'options', 'answer_key', 'answer', 'sequence'];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'options' => 'json', // Pastikan 'options' selalu di-handle sebagai JSON/array
+    protected $fillable = [
+        'reading_material_id',
+        'type',
+        'question',
+        'options', // Pastikan 'options' ada di sini
+        'correct_answer',
+        'position',
     ];
 
     /**
-     * Mendefinisikan relasi "belongsTo" ke model ReadingMaterial.
+     * # PERBAIKAN: Menambahkan 'casts' untuk kolom 'options'.
+     * Ini akan secara otomatis mengubah array menjadi JSON saat menyimpan
+     * dan JSON menjadi array saat mengambil data.
+     *
+     * @var array
      */
-    public function readingMaterial()
-    {
-        return $this->belongsTo(\App\Models\ReadingMaterial::class);
-    }
+    protected $casts = [
+        'options' => 'array',
+    ];
 
-    public function studentAnswers()
+    /**
+     * Relasi ke ReadingMaterial.
+     */
+    public function readingMaterial(): BelongsTo
     {
-        return $this->hasMany(StudentHotsActivityAnswer::class);
+        return $this->belongsTo(ReadingMaterial::class);
     }
 }

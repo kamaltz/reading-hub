@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotsActivity;         // PERBAIKAN: Menambahkan 'use' statement
-use App\Models\ReadingMaterial;     // PERBAIKAN: Menambahkan 'use' statement
+use App\Models\HotsActivity;
+use App\Models\ReadingMaterial;
 use Illuminate\Http\Request;
 
 class HotsActivityController extends Controller
@@ -14,18 +14,15 @@ class HotsActivityController extends Controller
      */
     public function all()
     {
-        // Menggunakan with() untuk eager loading agar lebih efisien
-        $activities = HotsActivity::with('readingMaterial')->latest()->paginate(15);
+        $activities = HotsActivity::with('readingMaterial')->latest()->get();
         return view('admin.activities.all', compact('activities'));
     }
 
     /**
-     * Menampilkan form untuk membuat aktivitas baru berdasarkan materi.
-     * Menggunakan Route Model Binding untuk efisiensi dan keamanan.
+     * Menampilkan form untuk membuat aktivitas baru untuk materi tertentu.
      */
     public function create(ReadingMaterial $material)
     {
-        // Variabel $material sudah otomatis didapat dari route model binding
         return view('admin.activities.create', compact('material'));
     }
 
@@ -33,122 +30,136 @@ class HotsActivityController extends Controller
      * Menyimpan aktivitas baru ke database.
      */
     public function store(Request $request)
-{
-    // 1. Validasi data yang masuk dari form
-    $validated = $request->validate([
-        'reading_material_id' => 'required|exists:reading_materials,id',
-        'type' => 'required|in:essay,multiple_choice,true_false', // Sesuaikan dengan tipe yang ada
-        'question' => 'required|string|min:5',
-        // Kunci jawaban hanya wajib diisi jika tipe BUKAN 'essay'
-        'correct_answer' => 'required_unless:type,essay|nullable|string',
-        'options' => 'nullable|array', // Validasi untuk pilihan ganda
-    ]);
+    {
+        $validated = $request->validate([
+            'reading_material_id' => 'required|exists:reading_materials,id',
+            'type' => 'required|in:essay,multiple_choice,true_false',
+            'question' => 'required|string|min:5',
+            'correct_answer' => 'required_unless:type,essay|nullable|string',
+            'options' => 'nullable|array',
+        ]);
 
-    // 2. Buat aktivitas baru menggunakan data yang sudah divalidasi
-    // Kita tidak bisa langsung menggunakan $validated karena 'options' perlu penanganan khusus
-    HotsActivity::create([
-        'reading_material_id' => $validated['reading_material_id'],
-        'type' => $validated['type'],
-        'question' => $validated['question'],
-        'correct_answer' => $validated['correct_answer'] ?? null, // Beri nilai null jika kosong
-        'options' => $request->input('options'), // Ambil options langsung dari request
-    ]);
+        HotsActivity::create([
+            'reading_material_id' => $validated['reading_material_id'],
+            'type' => $validated['type'],
+            'question' => $validated['question'],
+            'correct_answer' => $validated['correct_answer'] ?? null,
+            'options' => $request->input('options'),
+        ]);
 
-    // 3. Kembali ke halaman detail materi dengan pesan sukses
-    return redirect()->route('admin.materials.show', $validated['reading_material_id'])
-                     ->with('success', 'Aktivitas baru berhasil ditambahkan.');
-}
+        // # PERBAIKAN: Mengirimkan ID materi saat redirect
+        return redirect()->route('admin.materials.show', $validated['reading_material_id'])
+                         ->with('success', 'Aktivitas baru berhasil ditambahkan.');
+    }
 
-
-        /**
+    /**
      * Menampilkan form untuk mengedit aktivitas.
-     *
-     * @param  \App\Models\HotsActivity  $activity
-     * @return \Illuminate\View\View
      */
     public function edit(HotsActivity $activity)
     {
-        // Model $activity sudah otomatis didapat dari route model binding
         return view('admin.activities.edit', compact('activity'));
     }
 
     /**
      * Memperbarui aktivitas di database.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\HotsActivity  $activity
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, HotsActivity $activity)
+       public function update(Request $request, HotsActivity $activity)
     {
-        // 1. Validasi input dari form
-        $validated = $request->validate([
-            'question' => 'required|string|min:10',
-            'type' => 'required|in:essay,multiple_choice',
-            'options' => 'required_if:type,multiple_choice|array|size:4',
-            'options.*' => 'required_if:type,multiple_choice|string|max:255',
-            'answer_key' => 'required_if:type,multiple_choice|in:A,B,C,D',
-        ]);
+        // Aturan validasi dasar
+        $rules = [
+            'type' => 'required|in:essay,multiple_choice,true_false',
+            'question' => 'required|string|min:5',
+            'options' => 'nullable|array',
+            // Memastikan setiap opsi adalah teks, jika dikirim
+            'options.*' => 'nullable|string',
+        ];
 
-        // 2. Menyiapkan data untuk pembaruan agar konsisten
-        $data = [
-            'question' => $validated['question'],
+        // Validasi kondisional untuk kunci jawaban
+        if ($request->input('type') !== 'essay') {
+            $rules['correct_answer'] = 'required|string';
+        }
+        
+        // Validasi kondisional untuk pilihan ganda
+        if ($request->input('type') === 'multiple_choice') {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*'] = 'required|string';
+        }
+
+        $validated = $request->validate($rules);
+        
+        // Siapkan data yang akan di-update
+        $dataToUpdate = [
             'type' => $validated['type'],
-            'options' => null,
-            'answer_key' => null,
+            'question' => $validated['question'],
         ];
 
         if ($validated['type'] === 'multiple_choice') {
-            $data['options'] = $validated['options'];
-            $data['answer_key'] = $validated['answer_key'];
+            // Saring pilihan yang kosong sebelum disimpan
+            $dataToUpdate['options'] = array_filter($validated['options']);
+            $dataToUpdate['correct_answer'] = $validated['correct_answer'];
+        } elseif ($validated['type'] === 'true_false') {
+            $dataToUpdate['options'] = null; // Pastikan 'options' null untuk tipe ini
+            $dataToUpdate['correct_answer'] = $validated['correct_answer'];
+        } else { // Untuk 'essay'
+            $dataToUpdate['options'] = null;
+            $dataToUpdate['correct_answer'] = null;
         }
 
-        // 3. Update aktivitas dengan data yang bersih
-        $activity->update($data);
+        // Lakukan update pada aktivitas
+        $activity->update($dataToUpdate);
 
-        // 4. Kembali ke halaman detail materi dengan pesan sukses
+        // Arahkan kembali ke halaman detail materi
         return redirect()->route('admin.materials.show', $activity->reading_material_id)
-                    ->with('success', 'Aktivitas berhasil diperbarui.');
+                         ->with('success', 'Aktivitas berhasil diperbarui.');
     }
 
     /**
      * Menghapus aktivitas dari database.
-     *
-     * @param  \App\Models\HotsActivity  $activity
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(HotsActivity $activity)
+public function destroy(HotsActivity $activity)
     {
-        $materialId = $activity->reading_material_id;
+        // Simpan ID materi dari aktivitas yang akan dihapus.
+        $readingMaterialId = $activity->reading_material_id;
+
+        // Hapus aktivitas dari database.
         $activity->delete();
 
-        return redirect()->route('admin.materials.show', $materialId)
-                    ->with('success', 'Aktivitas berhasil dihapus.');
-    }
+        // # SOLUSI FINAL:
+        // Cek apakah aktivitas tersebut memiliki ID materi.
+        if ($readingMaterialId) {
+            // Jika ADA, kembali ke halaman detail materi seperti biasa.
+            return redirect()->route('admin.materials.show', $readingMaterialId)
+                            ->with('success', 'Aktivitas berhasil dihapus.');
+        }
 
+        // Jika TIDAK ADA ID materi (untuk menghindari error),
+        // cukup kembali ke halaman sebelumnya.
+        return back()->with('success', 'Aktivitas (tanpa materi terkait) berhasil dihapus.');
+    }
+    
+    /**
+     * Menduplikasi aktivitas.
+     */
     public function duplicate(HotsActivity $activity)
-{
-    // Gunakan method replicate() dari Eloquent untuk menyalin model
-    $newActivity = $activity->replicate();
+    {
+        $newActivity = $activity->replicate();
+        $newActivity->question = $activity->question . ' (Salinan)';
+        $newActivity->save();
 
-    // Ubah sedikit pertanyaannya agar tidak sama persis
-    $newActivity->question = $activity->question . ' (Salinan)';
-
-    // Simpan model baru ke database
-    $newActivity->save();
-
-    return back()->with('success', 'Aktivitas berhasil diduplikasi.');
-}
-
-public function reorder(Request $request)
-{
-    $request->validate(['ids' => 'required|array']);
-
-    foreach ($request->ids as $index => $id) {
-        HotsActivity::where('id', $id)->update(['position' => $index + 1]);
+        return back()->with('success', 'Aktivitas berhasil diduplikasi.');
     }
 
-    return response()->json(['status' => 'success']);
-}
+    /**
+     * Mengubah urutan aktivitas.
+     */
+    public function reorder(Request $request)
+    {
+        $request->validate(['ids' => 'required|array']);
 
+        foreach ($request->ids as $index => $id) {
+            HotsActivity::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
 }
