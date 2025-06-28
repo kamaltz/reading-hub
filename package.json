@@ -22,6 +22,7 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "@headlessui/react": "^2.2.4",
         "@inertiajs/react": "^2.0.14",
         "@radix-ui/react-label": "^2.1.7",
         "@radix-ui/react-progress": "^1.1.7",
