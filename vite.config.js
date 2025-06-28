@@ -1,22 +1,30 @@
-// vite.config.js
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
-import vue from "@vitejs/plugin-vue"; // <-- Import plugin Vue
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { fileURLToPath } from "url"; // <-- Impor helper yang benar
+
+// Ini adalah cara yang benar dan robust untuk mendapatkan __dirname di ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ["resources/css/app.css", "resources/js/app.js"],
+            input: "resources/js/app.jsx",
             refresh: true,
         }),
-        vue({
-            // <-- Tambahkan plugin Vue
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
-        }),
+        react(),
     ],
+    resolve: {
+        alias: {
+            // Alias ini sekarang akan menunjuk ke path yang benar
+            "@": path.resolve(__dirname, "resources/js"),
+        },
+    },
+    server: {
+        // Gunakan IP eksplisit untuk menghindari masalah resolusi nama host
+        host: "127.0.0.1",
+        port: 5173,
+    },
 });
