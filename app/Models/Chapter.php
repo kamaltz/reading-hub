@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -27,6 +28,21 @@ class Chapter extends Model
     }
 
     /**
+     * Relasi untuk menghitung aktivitas yang sudah diselesaikan oleh user yang sedang login.
+     * Relasi ini dirancang untuk digunakan dengan withCount() untuk performa optimal.
+     */
+    public function completedActivitiesForCurrentUser(): HasMany
+    {
+        return $this->activities()
+            ->whereHas('attempts', function ($query) {
+                // Pastikan model ActivityAttempt dan kolomnya sudah sesuai
+                $query->where('user_id', Auth::id())
+                      ->where('status', 'completed');
+            });
+    }
+
+
+    /**
      * Accessor dinamis untuk menghitung progres penyelesaian chapter.
      * Atribut ini akan tersedia secara otomatis sebagai $chapter->progress.
      *
@@ -34,28 +50,16 @@ class Chapter extends Model
      */
     public function getProgressAttribute(): float
     {
-        // Untuk menghindari error jika tidak ada user yang login (misalnya di seeder atau tinker)
-        if (!auth()->check()) {
+        // Accessor ini sekarang mengandalkan eager-loaded counts untuk performa.
+        // Jika count tidak di-load sebelumnya, ia akan menjadi 0.
+        // Ini mendorong praktik yang baik untuk selalu melakukan eager-load.
+        $totalActivitiesCount = $this->activities_count ?? 0;
+
+        if ($totalActivitiesCount === 0) {
             return 0;
         }
 
-        // Ambil semua ID aktivitas yang ada di dalam chapter ini
-        $activityIds = $this->activities()->pluck('id');
-
-        // Jika tidak ada aktivitas sama sekali di chapter ini, progresnya 0%
-        if ($activityIds->isEmpty()) {
-            return 0;
-        }
-
-        // Hitung berapa banyak aktivitas yang sudah diselesaikan oleh siswa yang sedang login
-        $completedActivitiesCount = ActivityAttempt::where('user_id', auth()->id())
-            ->whereIn('hots_activity_id', $activityIds)
-            ->where('status', 'completed')
-            ->distinct('hots_activity_id') // Penting untuk memastikan satu aktivitas tidak dihitung ganda
-            ->count();
-
-        // Total aktivitas di chapter ini
-        $totalActivitiesCount = $activityIds->count();
+        $completedActivitiesCount = $this->completed_activities_for_current_user_count ?? 0;
 
         // Hitung persentase progres
         return ($completedActivitiesCount / $totalActivitiesCount) * 100;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
-import AdminLayout from "@/Layouts/AdminLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ export default function Create({ auth, chapters }) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AuthenticatedLayout user={auth.user}>
             <Head title="Tambah Aktivitas Baru" />
 
             <div className="p-4 sm:p-6 lg:p-8">
@@ -111,6 +111,6 @@ export default function Create({ auth, chapters }) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AuthenticatedLayout>
     );
 }

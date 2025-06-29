@@ -33,6 +33,9 @@ class ReadingMaterial extends Model
      */
     public function activities()
     {
-        return $this->hasMany(HotsActivity::class);
+        // The 'hots_activities' table was refactored to use 'chapter_id'
+        // instead of 'reading_material_id'. This relationship now correctly
+        // links activities that share the same chapter.
+        return $this->hasMany(Activity::class, 'chapter_id', 'chapter_id');
     }
 }

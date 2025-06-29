@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController; // Controller untuk Siswa
+use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController; // Controller untuk Admin (gunakan alias 'as' untuk menghindari konflik nama)
 use App\Http\Controllers\Admin\ActivityController;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified' /*, 'role:admin' */])->prefix('admin')->na
 
     // Rute untuk manajemen aktivitas
     Route::resource('activities', ActivityController::class);
+
+    // Rute untuk manajemen genre
+    Route::resource('genres', GenreController::class);
 
     // Tambahkan rute admin lainnya di sini...
 });

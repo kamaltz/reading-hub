@@ -8,5 +8,5 @@ return [
     App\Providers\RouteServiceProvider::class,
 
     // TAMBAHKAN BARIS INI
-    Tightenco\Ziggy\ZiggyServiceProvider::class,
+    Tighten\Ziggy\ZiggyServiceProvider::class,
 ];

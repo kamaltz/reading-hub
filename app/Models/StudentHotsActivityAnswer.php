@@ -24,6 +24,8 @@ class StudentHotsActivityAnswer extends Model
 
     public function hotsActivity()
     {
-        return $this->belongsTo(HotsActivity::class);
+        // The related model is now Activity. We must explicitly define the foreign key
+        // 'hots_activity_id' because it no longer matches Laravel's convention for an 'Activity' model.
+        return $this->belongsTo(Activity::class, 'hots_activity_id');
     }
 }

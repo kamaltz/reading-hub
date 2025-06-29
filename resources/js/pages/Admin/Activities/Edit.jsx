@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Head, useForm } from "@inertiajs/react";
-import AdminLayout from "@/Layouts/AdminLayout"; // Anda perlu membuat layout ini
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 // ... import komponen lain
@@ -40,7 +40,7 @@ export default function EditActivity({ auth, activity }) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AuthenticatedLayout user={auth.user}>
             <Head title={`Edit Aktivitas: ${activity.title}`} />
             <div className="p-4 sm:p-6 lg:p-8">
                 <h1 className="mb-4 text-2xl font-bold">Editor Aktivitas</h1>
@@ -68,6 +68,6 @@ export default function EditActivity({ auth, activity }) {
                     </Button>
                 </div>
             </div>
-        </AdminLayout>
+        </AuthenticatedLayout>
     );
 }

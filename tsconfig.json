@@ -1,31 +1,13 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
-        "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
+        "composite": true,
         "skipLibCheck": true,
+        "module": "ESNext",
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "jsx": "react-jsx",
+        "allowSyntheticDefaultImports": true,
         "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["resources/js/*"]
-        }
+        "allowJs": true,
+        "outDir": "./dist"
     },
-    "include": [
-        "resources/js/**/*.js",
-        "resources/js/**/*.jsx",
-        "resources/js/**/*.ts",
-        "resources/js/**/*.tsx"
-    ],
-    "references": [{ "path": "./tsconfig.node.json" }]
+    "include": ["postcss.config.js", "tailwind.config.js", "vite.config.js"]
 }

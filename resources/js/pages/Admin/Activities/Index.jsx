@@ -1,6 +1,6 @@
 import React from "react";
 import { router, Head, Link, usePage } from "@inertiajs/react";
-import AdminLayout from "@/Layouts/AdminLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import {
     Table,
     TableBody,
@@ -55,7 +55,7 @@ export default function Index({ auth, activities }) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AuthenticatedLayout user={auth.user}>
             <Head title="Manajemen Aktivitas" />
 
             <div className="p-4 sm:p-6 lg:p-8">
@@ -147,6 +147,6 @@ export default function Index({ auth, activities }) {
                     <Pagination links={activities.links} />
                 )}
             </div>
-        </AdminLayout>
+        </AuthenticatedLayout>
     );
 }
