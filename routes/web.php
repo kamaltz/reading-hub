@@ -54,13 +54,18 @@ Route::prefix('admin')
     ->middleware(['auth', AdminMiddleware::class])
     ->name('admin.')
     ->group(function () {
-        Route::get('students', [StudentController::class, 'index'])->name('students.index');
-    Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::resource('materials', ReadingMaterialController::class);
         Route::resource('genres', GenreController::class);
         Route::resource('chapters', ChapterController::class);
+        
+        // Rute Manajemen Siswa yang Baru dan Lengkap
+        Route::get('students/import', [StudentController::class, 'importForm'])->name('students.import.form');
+        Route::get('students/template', [StudentController::class, 'downloadTemplate'])->name('students.template');
+        Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
+        Route::resource('students', StudentController::class);
         
         Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
         
@@ -70,8 +75,6 @@ Route::prefix('admin')
         // # PERBAIKAN 1: Mengubah rute 'store' menjadi non-nested agar lebih sederhana
         // Rute ini sekarang akan menjadi '/admin/activities'
         Route::post('/activities', [HotsActivityController::class, 'store'])->name('activities.store');
-        
-        Route::resource('students', StudentProgressController::class)->only(['index', 'show']);
 
         // Rute untuk mengelola aktivitas individual
         Route::get('activities/{activity}/edit', [HotsActivityController::class, 'edit'])->name('activities.edit');
@@ -81,6 +84,15 @@ Route::prefix('admin')
         // # PERBAIKAN 2: Memindahkan dan memperbaiki rute 'duplicate' dan 'reorder' ke sini
         Route::post('activities/{activity}/duplicate', [HotsActivityController::class, 'duplicate'])->name('activities.duplicate');
         Route::post('activities/reorder', [HotsActivityController::class, 'reorder'])->name('activities.reorder');
+    });
+
+    // Rute untuk maintenance (hanya untuk development)
+    // Akses dari browser: http://your-app.test/clear-all-cache
+    Route::get('/clear-all-cache', function () {
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        return "Cache aplikasi (view, route, config) berhasil dibersihkan!";
     });
 
     // Tambahkan kode ini di paling bawah

@@ -29,7 +29,7 @@
                         <x-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.index')">
                         {{ __('Analitik') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.index')">
+                        <x-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
                         {{ __('Daftar Siswa') }}
                         </x-nav-link>
                         <x-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*')">
@@ -40,9 +40,6 @@
                         </x-nav-link>
                         <x-nav-link :href="route('admin.chapters.index')" :active="request()->routeIs('admin.chapters.*')">
                             Bab
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*')">
-                            Materi Bacaan
                         </x-nav-link>
                         <x-nav-link :href="route('admin.activities.all')" :active="request()->routeIs('admin.activities.*')">
                         Aktivitas
