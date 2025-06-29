@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+// Laravel Core & Relasi
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable
+// Filament
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
@@ -30,23 +35,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
+    
     /**
-     * Periksa apakah pengguna adalah admin.
-     * @return bool
+     * Tentukan apakah user bisa mengakses Filament Panel.
      */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin(); // Menggunakan fungsi isAdmin() yang sudah ada
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Relasi ke jawaban aktivitas siswa.
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function answers(): HasMany
     {
-        // Pastikan Anda sudah punya model StudentHotsActivityAnswer
         return $this->hasMany(StudentHotsActivityAnswer::class);
     }
 }
