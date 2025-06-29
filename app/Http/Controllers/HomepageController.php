@@ -3,16 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReadingMaterial;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class HomepageController extends Controller
 {
+    /**
+     * Menampilkan landing page dengan data statistik.
+     */
     public function index()
     {
-        // Ambil semua materi beserta relasi chapter dan genre, urutkan dari yang terbaru
-        $materials = ReadingMaterial::with('chapter', 'genre')->latest()->paginate(10); // Paginate 10 item per halaman
+        // Ambil data statistik untuk ditampilkan di landing page
+        $studentCount = User::where('role', 'student')->count();
+        $materialCount = ReadingMaterial::count();
 
-        // Kirim data materi ke view 'welcome'
-        return view('welcome', compact('materials'));
+        // Kirim data ke view
+        return view('welcome', [
+            'studentCount' => $studentCount,
+            'materialCount' => $materialCount,
+        ]);
     }
 }

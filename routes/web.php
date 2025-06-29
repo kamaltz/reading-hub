@@ -23,7 +23,7 @@ use App\Http\Controllers\Admin\StudentController;
 */
 
 // == HALAMAN PUBLIK ==
-Route::get('/', [HomepageController::class, 'index'])->name('home');
+Route::get('/', [HomepageController::class, 'index']);
 
 // == HALAMAN PENGGUNA TERAUTENTIKASI (SISWA/ADMIN) ==
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
