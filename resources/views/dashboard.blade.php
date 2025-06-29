@@ -51,6 +51,23 @@
                             </div>
                         </div>
                         
+                        {{-- Bagian Aksi Cepat Manajemen Materi --}}
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold leading-6 text-gray-900">Manajemen Materi</h3>
+                            <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                                <!-- Tombol Tambah Materi Baru -->
+                                <a href="{{ route('admin.materials.create') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
+                                    <p class="text-xl font-semibold text-purple-600">Tambah Materi Baru</p>
+                                    <p class="mt-1 text-sm text-gray-500">Membuat materi bacaan baru untuk siswa.</p>
+                                </a>
+                                <!-- Tombol Lihat Semua Materi -->
+                                <a href="{{ route('admin.materials.index') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
+                                    <p class="text-xl font-semibold text-cyan-600">Lihat Semua Materi</p>
+                                    <p class="mt-1 text-sm text-gray-500">Melihat dan mengelola semua materi yang ada.</p>
+                                </a>
+                            </div>
+                        </div>
+
                         {{-- Daftar Siswa Terbaru --}}
                         <div class="mt-8">
                             <h3 class="mb-4 text-lg font-semibold">Siswa Terbaru</h3>
