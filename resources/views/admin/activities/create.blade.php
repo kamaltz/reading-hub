@@ -10,8 +10,11 @@
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{-- x-data mendefinisikan state awal untuk Alpine.js. 'type' diatur ke 'essay' secara default. --}}
-                    <form x-data="{ type: '{{ old('type', 'essay') }}' }" action="{{ route('admin.activities.store', $material) }}" method="POST">
+                    {{-- PERBAIKAN: Mengubah action ke rute yang benar dan menambahkan input tersembunyi untuk material_id --}}
+                    <form x-data="{ type: '{{ old('type', 'essay') }}' }" action="{{ route('admin.activities.store') }}" method="POST">
                         @csrf
+                        {{-- Input tersembunyi untuk mengirimkan ID materi bacaan --}}
+                        <input type="hidden" name="reading_material_id" value="{{ $material->id }}">
                         
                         <div class="mb-4">
                             <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan</label>
@@ -55,15 +58,16 @@
 
                             {{-- Dropdown untuk Kunci Jawaban --}}
                             <div class="mt-4">
-                                <label for="answer_key" class="block text-sm font-medium text-gray-700">Kunci Jawaban</label>
-                                <select name="answer_key" id="answer_key" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                {{-- PERBAIKAN: Mengubah nama input dari 'answer_key' menjadi 'correct_answer' agar sesuai dengan controller --}}
+                                <label for="correct_answer" class="block text-sm font-medium text-gray-700">Kunci Jawaban</label>
+                                <select name="correct_answer" id="correct_answer" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Pilih Kunci Jawaban</option>
-                                    <option value="A" @selected(old('answer_key') == 'A')>A</option>
-                                    <option value="B" @selected(old('answer_key') == 'B')>B</option>
-                                    <option value="C" @selected(old('answer_key') == 'C')>C</option>
-                                    <option value="D" @selected(old('answer_key') == 'D')>D</option>
+                                    <option value="A" @selected(old('correct_answer') == 'A')>A</option>
+                                    <option value="B" @selected(old('correct_answer') == 'B')>B</option>
+                                    <option value="C" @selected(old('correct_answer') == 'C')>C</option>
+                                    <option value="D" @selected(old('correct_answer') == 'D')>D</option>
                                 </select>
-                                @error('answer_key') <span class="mt-1 text-sm text-red-500">{{ $message }}</span> @enderror
+                                @error('correct_answer') <span class="mt-1 text-sm text-red-500">{{ $message }}</span> @enderror
                             </div>
                         </div>
 

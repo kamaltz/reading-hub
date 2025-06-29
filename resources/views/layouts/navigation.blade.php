@@ -26,7 +26,16 @@
 
                     {{-- TAUTAN KHUSUS ADMIN --}}
                     @if (Auth::user()->isAdmin())
-                         <x-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')">
+                        <x-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.index')">
+                        {{ __('Analitik') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.index')">
+                        {{ __('Daftar Siswa') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.materials.index')" :active="request()->routeIs('admin.materials.*')">
+                        Materi Bacaan
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')">
                             Genre
                         </x-nav-link>
                         <x-nav-link :href="route('admin.chapters.index')" :active="request()->routeIs('admin.chapters.*')">
@@ -36,10 +45,7 @@
                             Materi Bacaan
                         </x-nav-link>
                         <x-nav-link :href="route('admin.activities.all')" :active="request()->routeIs('admin.activities.*')">
-                             Aktivitas
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
-                             Siswa
+                        Aktivitas
                         </x-nav-link>
                     @endif
                 </div>

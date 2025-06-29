@@ -140,14 +140,16 @@ public function destroy(HotsActivity $activity)
     /**
      * Menduplikasi aktivitas.
      */
-    public function duplicate(HotsActivity $activity)
-    {
-        $newActivity = $activity->replicate();
-        $newActivity->question = $activity->question . ' (Salinan)';
-        $newActivity->save();
+  public function duplicate(HotsActivity $activity)
+{
+    $newActivity = $activity->replicate();
+    $newActivity->question = $activity->question . ' (Salinan)';
+    $newActivity->created_at = now();
+    $newActivity->updated_at = now();
+    $newActivity->save();
 
-        return back()->with('success', 'Aktivitas berhasil diduplikasi.');
-    }
+    return back()->with('success', 'Aktivitas berhasil diduplikasi.');
+}
 
     /**
      * Mengubah urutan aktivitas.

@@ -8,13 +8,38 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             @if (Auth::user()->isAdmin())
-                {{-- Tampilan untuk Admin (Tidak Berubah) --}}
-                <div class="overflow-hidden p-6 bg-white shadow-sm sm:rounded-lg">
-                    {{-- Konten dasbor admin di sini --}}
-                    <p>Selamat datang, Admin!</p>
+                {{-- Tampilan untuk Admin --}}
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="p-6 text-white bg-blue-500 rounded-lg shadow-md">
+                        <h3 class="text-lg">Total Siswa</h3>
+                        <p class="text-3xl font-bold">{{ $studentsCount ?? 0 }}</p>
+                    </div>
+                    <div class="p-6 text-white bg-green-500 rounded-lg shadow-md">
+                        <h3 class="text-lg">Total Materi</h3>
+                        <p class="text-3xl font-bold">{{ $materialsCount ?? 0 }}</p>
+                    </div>
+                    <div class="p-6 text-white bg-yellow-500 rounded-lg shadow-md">
+                        <h3 class="text-lg">Total Genre</h3>
+                        <p class="text-3xl font-bold">{{ $genresCount ?? 0 }}</p>
+                    </div>
+                    <div class="p-6 text-white bg-indigo-500 rounded-lg shadow-md">
+                        <h3 class="text-lg">Total Chapter</h3>
+                        <p class="text-3xl font-bold">{{ $chaptersCount ?? 0 }}</p>
+                    </div>
+                </div>
+                <div class="overflow-hidden p-6 mt-8 bg-white shadow-sm sm:rounded-lg">
+                    <h3 class="mb-4 text-lg font-semibold">Siswa Terbaru</h3>
+                    <ul>
+                        @forelse($latestStudents as $student)
+                            <li class="py-2 border-b">{{ $student->name }} - {{ $student->email }}</li>
+                        @empty
+                            <li>Tidak ada data siswa baru.</li>
+                        @endforelse
+                    </ul>
                 </div>
             @else
                 {{-- TAMPILAN UNTUK SISWA --}}
+                
                 {{-- 1. Bagian Statistik Progres --}}
                 <div class="overflow-hidden p-6 mb-8 bg-white shadow-sm sm:rounded-lg">
                     <h3 class="mb-4 text-lg font-semibold">Progres Belajar Saya</h3>
@@ -37,7 +62,7 @@
                 {{-- 2. Bagian Filter Materi --}}
                 <div class="p-6 mb-6 bg-white rounded-lg shadow-sm">
                     <form action="{{ route('dashboard') }}" method="GET">
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div>
                                 <label for="chapter_id" class="block text-sm font-medium text-gray-700">Filter berdasarkan Bab</label>
                                 <select name="chapter_id" id="chapter_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -77,20 +102,20 @@
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @forelse ($materials as $material)
                         @php
-                            // PERBAIKAN 1: Menggunakan nama relasi 'activities'
+                            // Kalkulasi progres materi secara efisien menggunakan data dari controller
                             $totalActivitiesInMaterial = $material->activities->count();
-                            
-                            // PERBAIKAN 2: Menggunakan nama relasi 'answers'
-                            $answeredActivitiesInMaterial = Auth::user()->answers()
-                                ->whereIn('hots_activity_id', $material->activities->pluck('id'))
-                                ->distinct('hots_activity_id')
+                            $answeredActivitiesInMaterial = $material->activities
+                                ->whereIn('id', $userAnsweredActivityIds)
                                 ->count();
-                            $progress = ($totalActivitiesInMaterial > 0) ? ($answeredActivitiesInMaterial / $totalActivitiesInMaterial) * 100 : 0;
+                            $progress = ($totalActivitiesInMaterial > 0) ? round(($answeredActivitiesInMaterial / $totalActivitiesInMaterial) * 100) : 0;
                         @endphp
-                        <div class="flex overflow-hidden flex-col justify-between bg-white rounded-lg shadow-md">
+                        <div class="flex overflow-hidden flex-col justify-between bg-white rounded-lg shadow-md transition hover:shadow-xl">
                             <div class="p-6">
                                 <h4 class="mb-2 text-lg font-bold">{{ $material->title }}</h4>
-                                <p class="mb-4 text-sm text-gray-600">{{ Str::limit($material->description, 100) }}</p>
+                                <p class="mb-1 text-xs text-gray-500">
+                                    Bab: {{ $material->chapter->title ?? 'N/A' }} | Genre: {{ $material->chapter->genre->name ?? 'N/A' }}
+                                </p>
+                                <p class="mb-4 h-20 text-sm text-gray-600">{{ Str::limit($material->description, 120) }}</p>
 
                                 @if ($totalActivitiesInMaterial > 0)
                                     <div>
@@ -103,7 +128,7 @@
                                         </div>
                                     </div>
                                 @else
-                                     <p class="text-sm text-gray-500">Belum ada aktivitas untuk materi ini.</p>
+                                     <p class="text-sm italic text-gray-500">Belum ada aktivitas untuk materi ini.</p>
                                 @endif
                             </div>
                             <div class="px-6 py-4 bg-gray-50">

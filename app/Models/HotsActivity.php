@@ -31,10 +31,11 @@ class HotsActivity extends Model
      *
      * @var array
      */
-    protected $casts = [
-        'options' => 'array',
-    ];
-
+   protected $casts = [
+    'options' => 'array',
+    'correct_answer' => 'array', // atau 'json'
+    'configuration' => 'array', // atau 'json'
+];
     /**
      * Relasi ke ReadingMaterial.
      */

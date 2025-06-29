@@ -3,64 +3,84 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Chapter;
 use App\Models\Genre;
+use App\Models\Chapter;
 use App\Models\HotsActivity;
 use App\Models\ReadingMaterial;
-use App\Models\StudentHotsActivityAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
     /**
      * Handle the incoming request.
+     *
+     * @param Request $request
+     * @return View
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): View
     {
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Tampilan untuk Admin
         if ($user->isAdmin()) {
-            // Logika untuk Admin
+            $studentsCount = User::where('role', 'student')->count();
+            $materialsCount = ReadingMaterial::count();
+            $genresCount = Genre::count();
+            $chaptersCount = Chapter::count();
+            $latestStudents = User::where('role', 'student')->latest()->take(5)->get();
+
             return view('dashboard', [
-                'totalMaterials' => ReadingMaterial::count(),
-                'totalActivities' => HotsActivity::count(),
-                'totalStudents' => User::where('role', 'student')->count(),
-                'totalAnswers' => StudentHotsActivityAnswer::count(),
+                'studentsCount' => $studentsCount,
+                'materialsCount' => $materialsCount,
+                'genresCount' => $genresCount,
+                'chaptersCount' => $chaptersCount,
+                'latestStudents' => $latestStudents,
             ]);
-        } else {
-            // Logika untuk Siswa
-            $totalAttemptedActivities = $user->answers()->distinct('hots_activity_id')->count();
-            $completedActivities = $user->answers()->where('is_correct', true)->distinct('hots_activity_id')->count();
+        } 
+        
+        // Tampilan untuk Siswa
+        else {
+            // --- Kalkulasi Data Statistik ---
             $totalAvailableActivities = HotsActivity::count();
+            $userAnswersQuery = $user->answers(); // Ambil query builder untuk jawaban user
+            $totalAttemptedActivities = $userAnswersQuery->count();
+            $completedActivities = (clone $userAnswersQuery)->where('is_correct', true)->count();
+            
+            // Ambil semua ID aktivitas yang pernah dijawab user (untuk progress bar)
+            $userAnsweredActivityIds = (clone $userAnswersQuery)->pluck('hots_activity_id');
 
-            // Ambil data untuk filter
-            $chapters = Chapter::orderBy('title')->get(); // <-- INI DIA PERBAIKANNYA
-            $genres = Genre::orderBy('name')->get();
+            // --- Logika untuk Filter Materi ---
+            $materialsQuery = ReadingMaterial::with(['activities', 'chapter.genre']); // Eager load
 
-            // Query dasar untuk materi
-            $materialsQuery = ReadingMaterial::query();
-
-            // Terapkan filter jika ada
+            // Filter berdasarkan chapter_id jika ada
             if ($request->filled('chapter_id')) {
                 $materialsQuery->where('chapter_id', $request->chapter_id);
             }
 
+            // Filter berdasarkan genre_id jika ada
             if ($request->filled('genre_id')) {
-                $materialsQuery->where('genre_id', $request->genre_id);
+                $materialsQuery->whereHas('chapter', function ($query) use ($request) {
+                    $query->where('genre_id', $request->genre_id);
+                });
             }
-            
-            // Ambil hasil query
-            $materials = $materialsQuery->with('activities')->get();
+
+            $materials = $materialsQuery->latest()->get();
 
             return view('dashboard', [
+                // Data Statistik
+                'totalAvailableActivities' => $totalAvailableActivities,
                 'totalAttemptedActivities' => $totalAttemptedActivities,
                 'completedActivities' => $completedActivities,
-                'totalAvailableActivities' => $totalAvailableActivities,
+                
+                // Data untuk Filter dan Daftar Materi
+                'genres' => Genre::all(),
+                'chapters' => Chapter::all(),
                 'materials' => $materials,
-                'chapters' => $chapters,
-                'genres' => $genres,
+
+                // Data untuk Kalkulasi Progress di View
+                'userAnsweredActivityIds' => $userAnsweredActivityIds,
             ]);
         }
     }

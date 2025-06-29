@@ -1,14 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Semua Aktivitas
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                Semua Aktivitas
+            </h2>
+            {{-- PERBAIKAN: Tambahkan tombol ini untuk memandu admin ke alur yang benar --}}
+            <a href="{{ route('admin.materials.index') }}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-700">
+                Pilih Materi untuk Tambah Aktivitas
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    {{-- PERBAIKAN: Tambahkan kotak informasi untuk memperjelas alur kerja --}}
+                    <div class="p-4 mb-6 text-sm text-blue-800 bg-blue-100 rounded-lg border border-blue-200" role="alert">
+                        <span class="font-medium">Petunjuk:</span> Untuk menambah aktivitas baru, Anda harus memilih materi terlebih dahulu dari halaman
+                        <a href="{{ route('admin.materials.index') }}" class="font-semibold underline hover:text-blue-900">Daftar Materi Bacaan</a>.
+                    </div>
+
                     @if (session('success'))
                         <div class="mb-4 text-sm font-medium text-green-600">
                             {{ session('success') }}

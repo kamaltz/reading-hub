@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\StudentHotsActivityAnswer;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -12,11 +11,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -24,21 +18,11 @@ class User extends Authenticatable
         'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -48,7 +32,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Mengecek apakah user adalah admin.
+     * Periksa apakah pengguna adalah admin.
+     * @return bool
      */
     public function isAdmin(): bool
     {
@@ -56,12 +41,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Mendefinisikan relasi bahwa seorang User memiliki banyak Jawaban Aktivitas HOTS.
+     * Relasi ke jawaban aktivitas siswa.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function answers(): HasMany
     {
-        // PERBAIKAN: Menggunakan foreign key 'user_id' yang benar sesuai standar Laravel.
-        // Laravel secara otomatis akan mencari kolom 'user_id' jika parameter kedua dikosongkan.
+        // Pastikan Anda sudah punya model StudentHotsActivityAnswer
         return $this->hasMany(StudentHotsActivityAnswer::class);
     }
 }
