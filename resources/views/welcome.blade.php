@@ -142,20 +142,17 @@
                         </ul>
                     </div>
                      <div>
-                        <h3 class="text-sm font-semibold text-gray-900">Tetap Terhubung</h3>
-                        <p class="mt-4 text-gray-600">Dapatkan update terbaru dan tips belajar eksklusif dari kami.</p>
-                        <form class="flex gap-2 mt-4">
+                        <h3 class="text-sm font-semibold text-gray-900">Tingkatkan Literasi</h3>
+                        <p class="mt-4 text-gray-600">Pelajari bermacam teks bahasa inggris untuk meningkatkan literasi bahasa inggrismu.</p>
+                        {{-- <form class="flex gap-2 mt-4">
                             <input type="email" placeholder="Email Anda" class="px-3 py-2 w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
                             <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Kirim</button>
-                        </form>
+                        </form> --}}
                     </div>
                 </div>
                 <div class="flex flex-col justify-between items-center pt-8 mt-16 text-xs text-gray-500 border-t border-gray-900/10 sm:flex-row">
-                    <p>&copy; {{ date('Y') }} ReadingHub. Didesain untuk Pendidikan Indonesia.</p>
-                    <div class="flex mt-4 space-x-4 sm:mt-0">
-                         <a href="#" class="hover:text-gray-900">Kebijakan Privasi</a>
-                         <a href="#" class="hover:text-gray-900">Syarat & Ketentuan</a>
-                    </div>
+                    <p>&copy; {{ date('Y') }} ReadingHub.</p>
+
                 </div>
             </div>
         </footer>

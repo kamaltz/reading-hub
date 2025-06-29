@@ -12,6 +12,7 @@ class GuestLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.guest');
+        // Ubah ini untuk menunjuk ke layout baru Anda
+        return view('layouts.auth-layout');
     }
 }
