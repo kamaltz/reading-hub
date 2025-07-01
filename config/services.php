@@ -36,7 +36,7 @@ return [
     ],
 
     'gemini' => [
-        'api_key' => env('AIzaSyD32AXNqtCL42XQSPX44doiwPK7P9OFkeM'),
+        'api_key' => env('GEMINI_API_KEY'),
     ],
 
 ];
