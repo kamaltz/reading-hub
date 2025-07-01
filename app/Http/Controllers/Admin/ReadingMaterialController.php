@@ -3,80 +3,108 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ReadingMaterial;
 use App\Models\Chapter;
 use App\Models\Genre;
-use App\Models\ReadingMaterial;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReadingMaterialController extends Controller
 {
     /**
-     * Menampilkan daftar semua materi bacaan.
+     * Display a listing of the resource.
      */
     public function index()
     {
-        // Ambil semua materi, eager load relasi untuk performa,
-        // dan hitung jumlah aktivitas terkait dengan withCount.
-        $materials = ReadingMaterial::with(['chapter', 'genre'])
-            ->withCount('activities')
-            ->latest()
-            ->get();
-
+        $materials = ReadingMaterial::with('chapter', 'genre')->latest()->paginate(10);
         return view('admin.materials.index', compact('materials'));
     }
 
     /**
-     * Menampilkan form untuk membuat materi baru.
+     * Show the form for creating a new resource.
      */
     public function create()
     {
-        $genres = Genre::all();
         $chapters = Chapter::all();
-        return view('admin.materials.create', compact('genres', 'chapters'));
+        $genres = Genre::all();
+        return view('admin.materials.create', compact('chapters', 'genres'));
     }
 
     /**
-     * Menyimpan materi baru.
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // Logika untuk menyimpan materi baru
-        // (Dapat Anda implementasikan sesuai kebutuhan)
-        // ...
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'chapter_id' => 'required|exists:chapters,id',
+            'genre_id' => 'required|exists:genres,id',
+            'illustration' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('illustration')) {
+            $validated['illustration'] = $request->file('illustration')->store('illustrations', 'public');
+        }
+
+        ReadingMaterial::create($validated);
 
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dibuat.');
     }
 
     /**
-     * Menampilkan halaman detail materi beserta aktivitasnya.
-     * Ini adalah halaman kunci tempat admin mengelola aktivitas.
+     * Display the specified resource.
      */
     public function show(ReadingMaterial $material)
     {
-        // Eager load relasi activities untuk ditampilkan di view.
         $material->load('activities');
         return view('admin.materials.show', compact('material'));
     }
 
     /**
-     * Menampilkan form untuk mengedit materi.
+     * Show the form for editing the specified resource.
      */
     public function edit(ReadingMaterial $material)
     {
-        $genres = Genre::all();
         $chapters = Chapter::all();
-        return view('admin.materials.edit', compact('material', 'genres', 'chapters'));
+        $genres = Genre::all();
+        return view('admin.materials.edit', compact('material', 'chapters', 'genres'));
     }
 
     /**
-     * Memperbarui materi yang ada.
+     * Update the specified resource in storage.
      */
     public function update(Request $request, ReadingMaterial $material)
     {
-        // Logika untuk memperbarui materi
-        // (Dapat Anda implementasikan sesuai kebutuhan)
-        // ...
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'chapter_id' => 'required|exists:chapters,id',
+            'genre_id' => 'required|exists:genres,id',
+            'illustration' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('illustration')) {
+            if ($material->illustration) {
+                Storage::disk('public')->delete($material->illustration);
+            }
+            $validated['illustration'] = $request->file('illustration')->store('illustrations', 'public');
+        }
+
+        $material->update($validated);
 
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(ReadingMaterial $material)
+    {
+        if ($material->illustration) {
+            Storage::disk('public')->delete($material->illustration);
+        }
+        $material->delete();
+        return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dihapus.');
     }
 }

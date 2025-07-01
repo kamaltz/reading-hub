@@ -42,7 +42,7 @@
                         <!-- Konten -->
                         <div class="mb-4">
                             <label for="content" class="block text-sm font-medium text-gray-700">Konten</label>
-                            <textarea name="content" id="content" rows="10" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" required>{{ old('content', $material->content) }}</textarea>
+                            <textarea name="content" class="tinymce-editor">...</textarea>
                             @error('content') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                         </div>
 

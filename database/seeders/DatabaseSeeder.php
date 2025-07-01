@@ -13,19 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Membuat pengguna default
         User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@readinghub.com',
+            'name' => 'Admin ReadHub',
+            'email' => 'admin@readhub.my.id',
             'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
-        User::factory(10)->create(['role' => 'student']);
-        
-        // Memanggil seeder untuk Genre dan Chapter
-        $this->call([
-            GenreSeeder::class,
-            ChapterSeeder::class,
+
+        User::factory()->create([
+            'name' => 'Siswa0',
+            'email' => 'siswa@readhub.my.id',
+            'password' => Hash::make('password'),
+            'role' => 'student',
         ]);
+        
+
     }
 }

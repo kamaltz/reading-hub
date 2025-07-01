@@ -2,25 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chapter;
+use App\Models\HotsActivity;
+use App\Models\StudentHotsActivityAnswer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StudentActivityController extends Controller
 {
     /**
-     * Menampilkan daftar aktivitas yang dikelompokkan per bab.
+     * Menampilkan daftar aktivitas yang telah dijawab oleh siswa.
      */
     public function index()
     {
-        // Ambil semua bab, beserta materi dan aktivitasnya menggunakan eager loading
-        // untuk menghindari N+1 query problem.
-        $chapters = Chapter::with(['readingMaterials.activities' => function ($query) {
-            // Kita bisa menambahkan constraint di sini jika perlu,
-            // misalnya hanya mengambil aktivitas yang aktif.
-        }])
-        ->whereHas('readingMaterials.activities') // Hanya ambil bab yang memiliki aktivitas
-        ->get();
+        $user = Auth::user();
+        // Asumsi relasi 'answers' ada di model User
+        $answers = $user->answers()->with('activity.readingMaterial')->paginate(10);
+        return view('students.activities.index', compact('answers'));
+    }
 
-        return view('student.activities.index', compact('chapters'));
+    /**
+     * Menyimpan jawaban siswa untuk sebuah aktivitas.
+     * INI ADALAH METODE YANG HILANG.
+     */
+    public function store(Request $request, HotsActivity $activity)
+    {
+        $request->validate([
+            'answer' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+
+        // Gunakan updateOrCreate untuk menyimpan atau memperbarui jawaban.
+        // Ini mencegah siswa mengirim jawaban ganda untuk aktivitas yang sama.
+        StudentHotsActivityAnswer::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'hots_activity_id' => $activity->id,
+            ],
+            [
+                'answer' => $request->input('answer'),
+            ]
+        );
+
+        // Kembali ke halaman materi setelah menjawab
+        return redirect()->route('materials.show', $activity->reading_material_id)
+                         ->with('success', 'Jawaban Anda berhasil disimpan!');
     }
 }

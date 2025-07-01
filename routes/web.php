@@ -67,21 +67,16 @@ Route::prefix('admin')
         Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
         Route::resource('students', StudentController::class);
         
-        Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
+         Route::get('activities', [HotsActivityController::class, 'all'])->name('activities.all');
         
         // Rute untuk membuat aktivitas baru di bawah materi tertentu
-        Route::get('/materials/{material}/activities/create', [HotsActivityController::class, 'create'])->name('activities.create');
-        
-        // # PERBAIKAN 1: Mengubah rute 'store' menjadi non-nested agar lebih sederhana
-        // Rute ini sekarang akan menjadi '/admin/activities'
-        Route::post('/activities', [HotsActivityController::class, 'store'])->name('activities.store');
+        Route::get('/activities/create', [HotsActivityController::class, 'create'])->name('activities.create');
 
-        // Rute untuk mengelola aktivitas individual
+        // Rute lainnya untuk aktivitas
+        Route::post('/activities', [HotsActivityController::class, 'store'])->name('activities.store');
         Route::get('activities/{activity}/edit', [HotsActivityController::class, 'edit'])->name('activities.edit');
         Route::put('activities/{activity}', [HotsActivityController::class, 'update'])->name('activities.update');
         Route::delete('activities/{activity}', [HotsActivityController::class, 'destroy'])->name('activities.destroy');
-        
-        // # PERBAIKAN 2: Memindahkan dan memperbaiki rute 'duplicate' dan 'reorder' ke sini
         Route::post('activities/{activity}/duplicate', [HotsActivityController::class, 'duplicate'])->name('activities.duplicate');
         Route::post('activities/reorder', [HotsActivityController::class, 'reorder'])->name('activities.reorder');
     });

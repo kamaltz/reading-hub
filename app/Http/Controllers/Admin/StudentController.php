@@ -79,7 +79,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class, 'ends_with:readhub.my.id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -108,7 +108,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$student->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$student->id, 'ends_with:readhub.my.id'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -180,8 +180,47 @@ class StudentController extends Controller
     {
         $filename = "template_import_siswa.csv";
         $headers = ['Content-Type' => 'text/csv'];
-        $content = "nama,email\nJohn Doe,john.doe@example.com\nJane Doe,jane.doe@example.com";
+        $content = "nama,email\nJohn Doe,john.doe@readhub.my.id\nJane Doe,jane.doe@readhub.my.id";
 
         return response($content, 200, $headers)->header('Content-Disposition', "attachment; filename={$filename}");
+    }
+    
+    /**
+     * Menampilkan form untuk generate siswa.
+     */
+    public function generateForm()
+    {
+        return view('admin.students.generate');
+    }
+
+    /**
+     * Membuat siswa secara massal berdasarkan range ID.
+     */
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'id_prefix' => 'required|numeric',
+            'range_start' => 'required|numeric|min:1',
+            'range_end' => 'required|numeric|gte:range_start',
+        ]);
+
+        $prefix = $request->id_prefix;
+        $start = $request->range_start;
+        $end = $request->range_end;
+
+        for ($i = $start; $i <= $end; $i++) {
+            $id = $prefix . str_pad($i, 3, '0', STR_PAD_LEFT);
+            $email = $id . '@readhub.my.id';
+
+            User::create([
+                'name' => 'Siswa ' . $id,
+                'email' => $email,
+                'student_id' => $id,
+                'password' => Hash::make($id), // Password sama dengan ID
+                'role' => 'student',
+            ]);
+        }
+
+        return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil digenerate.');
     }
 }
