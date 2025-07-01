@@ -36,8 +36,15 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email_prefix' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9._-]+$/'],
         ]);
+
+        $email = $request->email_prefix . '@readhub.my.id';
+        
+        // Check if email already exists
+        if (User::where('email', $email)->exists()) {
+            return back()->withErrors(['email_prefix' => 'Username email sudah digunakan.'])->withInput();
+        }
 
         // Generator ID otomatis
         $year = date('y');
@@ -54,7 +61,7 @@ class StudentController extends Controller
         User::create([
             'name' => $request->name,
             'student_id' => $studentId,
-            'email' => $request->email,
+            'email' => $email,
             'password' => Hash::make('password'),
             'role' => 'student',
         ]);
@@ -67,7 +74,9 @@ class StudentController extends Controller
      */
     public function show(User $student)
     {
-        return view('admin.students.show', compact('student'));
+        $studentAnswers = $student->answers;
+        $materials = \App\Models\ReadingMaterial::with('activities')->get();
+        return view('admin.students.show', compact('student', 'studentAnswers', 'materials'));
     }
 
     /**

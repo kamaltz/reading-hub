@@ -32,15 +32,38 @@ class DashboardController extends Controller
             $materialsCount = ReadingMaterial::count();
             $genresCount = Genre::count();
             $chaptersCount = Chapter::count();
+            $activitiesCount = HotsActivity::count();
+            
+            // Student progress statistics
+            $totalAnswers = \App\Models\StudentHotsActivityAnswer::count();
+            $correctAnswers = \App\Models\StudentHotsActivityAnswer::where('is_correct', true)->count();
+            $averageScore = $totalAnswers > 0 ? round(($correctAnswers / $totalAnswers) * 100, 1) : 0;
+            
+            // Active students (students who have answered at least one activity)
+            $activeStudents = User::where('role', 'student')
+                ->whereHas('answers')
+                ->count();
+            
             $latestStudents = User::where('role', 'student')->latest()->take(5)->get();
+            
+            // Recent activities
+            $recentAnswers = \App\Models\StudentHotsActivityAnswer::with(['user', 'hotsActivity.readingMaterial'])
+                ->latest()
+                ->take(10)
+                ->get();
 
-            // Kirim semua data statistik ke view dashboard admin
             return view('dashboard', [
                 'studentsCount' => $studentsCount,
                 'materialsCount' => $materialsCount,
                 'genresCount' => $genresCount,
                 'chaptersCount' => $chaptersCount,
+                'activitiesCount' => $activitiesCount,
+                'totalAnswers' => $totalAnswers,
+                'correctAnswers' => $correctAnswers,
+                'averageScore' => $averageScore,
+                'activeStudents' => $activeStudents,
                 'latestStudents' => $latestStudents,
+                'recentAnswers' => $recentAnswers,
             ]);
         } 
         
@@ -49,7 +72,7 @@ class DashboardController extends Controller
         // ===================================
         else {
             // --- Logika untuk Filter Materi ---
-            $materialsQuery = ReadingMaterial::with(['genre', 'chapter']); // Eager load relasi
+            $materialsQuery = ReadingMaterial::with(['genre', 'chapter', 'activities']); // Eager load relasi
 
             // Filter berdasarkan chapter_id jika ada di request URL
             if ($request->filled('chapter_id')) {
@@ -63,12 +86,23 @@ class DashboardController extends Controller
 
             $materials = $materialsQuery->latest()->paginate(12); // Gunakan paginate untuk daftar materi
 
+            // Statistics for student
+            $totalAttemptedActivities = $user->answers()->count();
+            $completedActivities = $user->answers()->where('is_correct', true)->count();
+            $totalAvailableActivities = HotsActivity::count();
+            $userAnsweredActivityIds = $user->answers()->pluck('hots_activity_id')->toArray();
+
             // Kirim semua data ke view dashboard siswa
             return view('dashboard', [
                 // Data untuk Filter dan Daftar Materi
                 'genres' => Genre::all(),
                 'chapters' => Chapter::all(),
                 'materials' => $materials,
+                // Statistics
+                'totalAttemptedActivities' => $totalAttemptedActivities,
+                'completedActivities' => $completedActivities,
+                'totalAvailableActivities' => $totalAvailableActivities,
+                'userAnsweredActivityIds' => $userAnsweredActivityIds,
             ]);
         }
     }

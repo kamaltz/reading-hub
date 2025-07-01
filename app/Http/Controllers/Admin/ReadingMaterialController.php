@@ -107,4 +107,19 @@ class ReadingMaterialController extends Controller
         $material->delete();
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dihapus.');
     }
+
+    /**
+     * Handle image upload for TinyMCE editor
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $path = $request->file('file')->store('editor-images', 'public');
+        $url = asset('storage/' . $path);
+
+        return response()->json(['location' => $url]);
+    }
 }

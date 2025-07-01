@@ -14,7 +14,14 @@
                     </div>
 
                     <h3 class="mb-2 text-2xl font-bold">{{ $material->title }}</h3>
-                    <p class="mb-6 text-gray-600">{{ $material->description }}</p>
+                    <p class="mb-4 text-gray-600">{{ $material->description }}</p>
+                    
+                    {{-- Rich Text Content --}}
+                    @if($material->content)
+                        <div class="mb-6 prose max-w-none">
+                            {!! $material->content !!}
+                        </div>
+                    @endif
 
                     @if (session('success'))
                         <div class="p-4 mb-4 text-green-700 bg-green-100 rounded-md">

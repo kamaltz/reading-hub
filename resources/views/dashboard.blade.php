@@ -8,80 +8,146 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="text-gray-100">
                     {{-- Tampilan untuk Admin --}}
-                    @if (Auth::user()->isAdmin())                        
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                            <!-- Card Jumlah Siswa -->
-                            <div class="p-6 text-white bg-blue-500 rounded-lg shadow-md">
-                                <h3 class="text-lg">Total Siswa</h3>
-                                <p class="text-3xl font-bold">{{ $studentsCount }}</p>
+                    @if (Auth::user()->isAdmin())
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
+                            <div class="p-6 bg-blue-600 rounded-lg shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-blue-800 rounded-full">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-blue-100">Total Siswa</p>
+                                        <p class="text-2xl font-bold text-white">{{ $studentsCount }}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- Card Jumlah Materi -->
-                            <div class="p-6 text-white bg-green-500 rounded-lg shadow-md">
-                                <h3 class="text-lg">Total Materi</h3>
-                                <p class="text-3xl font-bold">{{ $materialsCount }}</p>
-                            </div>
-                            <!-- Card Jumlah Genre -->
-                            <div class="p-6 text-white bg-yellow-500 rounded-lg shadow-md">
-                                <h3 class="text-lg">Total Genre</h3>
-                                <p class="text-3xl font-bold">{{ $genresCount }}</p>
-                            </div>
-                            <!-- Card Jumlah Chapter -->
-                            <div class="p-6 text-white bg-indigo-500 rounded-lg shadow-md">
-                                <h3 class="text-lg">Total Chapter</h3>
-                                <p class="text-3xl font-bold">{{ $chaptersCount }}</p>
-                            </div>
-                        </div>
-
-                        {{-- Bagian Aksi Cepat Manajemen Siswa --}}
-                        <div class="mt-8">
-                        <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-gray-100">Manajemen Siswa</h3>
-                        <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3">
-                            <a href="{{ route('admin.students.create') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <p class="text-xl font-semibold text-indigo-600 dark:text-indigo-400">Tambah Siswa</p>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Menambahkan satu akun siswa secara manual.</p>
-                            </a>
                             
-                            <a href="{{ route('admin.students.generate') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <p class="text-xl font-semibold text-teal-600 dark:text-teal-400">Generator Akun</p>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Membuat banyak akun dengan rentang ID.</p>
-                            </a>
-
-                            <a href="{{ route('admin.students.import.form') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <p class="text-xl font-semibold text-green-600 dark:text-green-400">Import dari File</p>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Menambahkan siswa dari file spreadsheet.</p>
-                            </a>
+                            <div class="p-6 bg-green-600 rounded-lg shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-green-800 rounded-full">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-green-100">Total Materi</p>
+                                        <p class="text-2xl font-bold text-white">{{ $materialsCount }}</p>
+                                    </div>
+                                </div>
                             </div>
-                             </div>
-                        
-                        {{-- Bagian Aksi Cepat Manajemen Materi --}}
-                        <div class="mt-8">
-                            <h3 class="text-lg font-semibold leading-6 text-gray-900">Manajemen Materi</h3>
-                            <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                                <!-- Tombol Tambah Materi Baru -->
-                                <a href="{{ route('admin.materials.create') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
-                                    <p class="text-xl font-semibold text-purple-600">Tambah Materi Baru</p>
-                                    <p class="mt-1 text-sm text-gray-500">Membuat materi bacaan baru untuk siswa.</p>
-                                </a>
-                                <!-- Tombol Lihat Semua Materi -->
-                                <a href="{{ route('admin.materials.index') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
-                                    <p class="text-xl font-semibold text-cyan-600">Lihat Semua Materi</p>
-                                    <p class="mt-1 text-sm text-gray-500">Melihat dan mengelola semua materi yang ada.</p>
-                                </a>
+                            
+                            <div class="p-6 bg-purple-600 rounded-lg shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-purple-800 rounded-full">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-purple-100">Total Aktivitas</p>
+                                        <p class="text-2xl font-bold text-white">{{ $activitiesCount }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 bg-orange-600 rounded-lg shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-orange-800 rounded-full">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-orange-100">Rata-rata Skor</p>
+                                        <p class="text-2xl font-bold text-white">{{ $averageScore }}%</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Daftar Siswa Terbaru --}}
-                        <div class="mt-8">
-                            <h3 class="mb-4 text-lg font-semibold">Siswa Terbaru</h3>
-                            <ul class="divide-y divide-gray-200">
-                                @forelse($latestStudents as $student)
-                                    <li class="py-3">{{ $student->name }} - <span class="text-sm text-gray-500">{{ $student->email }}</span></li>
-                                @empty
-                                    <li class="py-3 text-gray-500">Tidak ada data siswa baru.</li>
-                                @endforelse
-                            </ul>
+                        <!-- Progress Overview -->
+                        <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
+                            <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
+                                <h3 class="mb-4 text-lg font-semibold text-white">Progres Keseluruhan</h3>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">Siswa Aktif</span>
+                                        <span class="text-white font-semibold">{{ $activeStudents }}/{{ $studentsCount }}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $studentsCount > 0 ? ($activeStudents / $studentsCount) * 100 : 0 }}%"></div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">Total Jawaban</span>
+                                        <span class="text-white font-semibold">{{ $totalAnswers }}</span>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">Jawaban Benar</span>
+                                        <span class="text-green-400 font-semibold">{{ $correctAnswers }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
+                                <h3 class="mb-4 text-lg font-semibold text-white">Siswa Terbaru</h3>
+                                <div class="space-y-3">
+                                    @forelse($latestStudents as $student)
+                                        <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                                            <div>
+                                                <p class="text-white font-medium">{{ $student->name }}</p>
+                                                <p class="text-sm text-gray-400">{{ $student->email }}</p>
+                                            </div>
+                                            <span class="text-xs text-gray-500">{{ $student->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    @empty
+                                        <p class="text-gray-400">Belum ada siswa terdaftar.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
+                            <h3 class="mb-4 text-lg font-semibold text-white">Aktivitas Terbaru</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="border-b border-gray-700">
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Siswa</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Materi</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Status</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Waktu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-700">
+                                        @forelse($recentAnswers as $answer)
+                                            <tr>
+                                                <td class="px-4 py-3 text-sm text-white">{{ $answer->user->name }}</td>
+                                                <td class="px-4 py-3 text-sm text-gray-300">{{ $answer->hotsActivity->readingMaterial->title ?? 'N/A' }}</td>
+                                                <td class="px-4 py-3">
+                                                    @if($answer->is_correct)
+                                                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Benar</span>
+                                                    @else
+                                                        <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Salah</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 py-3 text-sm text-gray-400">{{ $answer->created_at->diffForHumans() }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="px-4 py-3 text-center text-gray-400">Belum ada aktivitas.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     {{-- Tampilan untuk Siswa --}}
                     @else

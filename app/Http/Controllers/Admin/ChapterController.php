@@ -11,8 +11,7 @@ class ChapterController extends Controller
 {
     public function index()
     {
-        // Mengurutkan berdasarkan nomor urut (sequence)
-        $chapters = Chapter::orderBy('sequence')->get();
+        $chapters = Chapter::orderBy('id')->get();
         return view('admin.chapters.index', compact('chapters'));
     }
 
@@ -23,10 +22,8 @@ class ChapterController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi untuk title dan sequence
         $request->validate([
             'title' => 'required|string|max:255',
-            'sequence' => 'required|integer|min:1',
         ]);
 
         Chapter::create($request->all());
@@ -41,10 +38,8 @@ class ChapterController extends Controller
 
     public function update(Request $request, Chapter $chapter)
     {
-        // Validasi untuk title dan sequence
         $request->validate([
             'title' => 'required|string|max:255',
-            'sequence' => 'required|integer|min:1',
         ]);
 
         $chapter->update($request->all());

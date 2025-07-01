@@ -25,7 +25,8 @@
 
                         <div class="mb-4">
                             <label for="content" class="block text-sm font-medium text-gray-700">Konten</label>
-                            <textarea name="content" class="tinymce-editor">...</textarea>
+                            <textarea name="content" style="display:none;">{{ old('content') }}</textarea>
+                            <div class="quill-editor" style="height: 400px;"></div>
                             @error('content') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                         </div>
 

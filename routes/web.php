@@ -57,6 +57,7 @@ Route::prefix('admin')
         Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         
         Route::resource('materials', ReadingMaterialController::class);
+        Route::post('materials/upload-image', [ReadingMaterialController::class, 'uploadImage'])->name('materials.upload-image');
         Route::resource('genres', GenreController::class);
         Route::resource('chapters', ChapterController::class);
         

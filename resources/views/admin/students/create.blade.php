@@ -19,26 +19,13 @@
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="email" :value="__('Email (domain: readhub.my.id)')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="password" :value="__('Password')" />
-                            <x-text-input id="password" class="block mt-1 w-full"
-                                            type="password"
-                                            name="password"
-                                            required autocomplete="new-password" />
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
-                            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                            type="password"
-                                            name="password_confirmation" required autocomplete="new-password" />
-                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                            <x-input-label for="email_prefix" :value="__('Username Email')" />
+                            <div class="flex items-center">
+                                <x-text-input id="email_prefix" class="block mt-1 flex-1" type="text" name="email_prefix" :value="old('email_prefix')" required />
+                                <span class="ml-2 text-sm text-gray-600">@readhub.my.id</span>
+                            </div>
+                            <x-input-error :messages="$errors->get('email_prefix')" class="mt-2" />
+                            <p class="mt-1 text-sm text-gray-500">Contoh: jika diisi "john", email akan menjadi john@readhub.my.id</p>
                         </div>
 
                         <div class="flex justify-end items-center mt-4">

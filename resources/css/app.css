@@ -37,3 +37,40 @@
 .animate-slide-in-up {
     animation: slide-in-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
+
+/* Rich text content styles */
+.prose {
+    @apply text-gray-900 leading-relaxed;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    @apply font-bold text-gray-900 mt-6 mb-4;
+}
+
+.prose h1 { @apply text-2xl; }
+.prose h2 { @apply text-xl; }
+.prose h3 { @apply text-lg; }
+
+.prose p {
+    @apply mb-4 text-base;
+}
+
+.prose img {
+    @apply max-w-full h-auto rounded-lg shadow-md my-4;
+}
+
+.prose ul, .prose ol {
+    @apply mb-4 pl-6;
+}
+
+.prose li {
+    @apply mb-2;
+}
+
+.prose strong {
+    @apply font-semibold;
+}
+
+.prose em {
+    @apply italic;
+}

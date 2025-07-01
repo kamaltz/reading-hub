@@ -14,6 +14,14 @@ class Chapter extends Model
 
     protected $fillable = ['title', 'genre_id'];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('ordered', function ($builder) {
+            $builder->orderBy('id');
+        });
+    }
+
     /**
      * INI ADALAH FUNGSI YANG HILANG
      * Mendefinisikan bahwa Chapter ini milik satu Genre.
