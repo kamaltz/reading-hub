@@ -44,8 +44,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('materials.show', ['material' => $readingMaterial]);
     })->name('materials.show');
     
+    Route::post('/materials/{material}/submit', [StudentActivityController::class, 'submitMaterial'])->name('materials.submit');
+    
     Route::get('/activities', [StudentActivityController::class, 'index'])->name('student.activities.index');
     Route::post('/activities/{activity}/answer', [StudentActivityController::class, 'store'])->name('activities.answer');
+    Route::get('/progress', [StudentActivityController::class, 'progress'])->name('student.progress');
+    Route::get('/recent', [StudentActivityController::class, 'recent'])->name('student.recent');
 });
 
 

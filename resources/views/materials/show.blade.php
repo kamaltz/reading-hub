@@ -29,47 +29,124 @@
                         </div>
                     @endif
 
-                    {{-- PERBAIKAN: Looping pada $material->activities, bukan $activities --}}
-                    @forelse ($material->activities as $activity)
-                        @php
-                            // Cek apakah siswa sudah menjawab aktivitas ini
-                            // Kita asumsikan $userAnswers sudah dikirim dari controller/route jika diperlukan
-                            $userAnswer = Auth::user()->answers->keyBy('hots_activity_id')->get($activity->id);
-                        @endphp
-                        <div class="py-6 border-t border-gray-200">
-                            <p class="mb-2 font-semibold">{{ $loop->iteration }}. {{ $activity->question }}</p>
+                    @php
+                        $hasAnswered = Auth::user()->answers->whereIn('hots_activity_id', $material->activities->pluck('id'))->count() > 0;
+                        $totalQuestions = $material->activities->count();
+                        $correctAnswers = Auth::user()->answers->whereIn('hots_activity_id', $material->activities->pluck('id'))->where('is_correct', true)->count();
+                        $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
+                    @endphp
 
-                            @if($userAnswer)
-                                <!-- Tampilkan jawaban yang sudah dikirim -->
-                                <div class="p-4 bg-gray-100 rounded-md">
-                                    <p class="text-sm text-gray-600">Jawaban Anda:</p>
-                                    <p class="font-medium">{{ $userAnswer->answer }}</p>
-                                    @if ($userAnswer->is_correct)
-                                        <p class="mt-2 text-sm font-bold text-green-600">Status: Benar</p>
-                                    @else
-                                        <p class="mt-2 text-sm font-bold text-red-600">Status: Salah</p>
+                    @if($hasAnswered)
+                        <!-- Show Results -->
+                        <div class="mb-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="text-center">
+                                <h3 class="text-2xl font-bold text-blue-900 mb-2">Hasil Pembelajaran</h3>
+                                <div class="text-4xl font-bold text-blue-600 mb-2">{{ $score }}%</div>
+                                <p class="text-blue-800">{{ $correctAnswers }} dari {{ $totalQuestions }} jawaban benar</p>
+                            </div>
+                        </div>
+
+                        <!-- Show Questions with Answers -->
+                        @foreach ($material->activities as $activity)
+                            @php
+                                $userAnswer = Auth::user()->answers->keyBy('hots_activity_id')->get($activity->id);
+                            @endphp
+                            <div class="py-6 border-t border-gray-200">
+                                <div class="mb-4">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ $loop->iteration }}. {{ $activity->question }}</h4>
+                                    @if($activity->image)
+                                        <img src="{{ asset('storage/' . $activity->image) }}" alt="Question Image" class="max-w-md h-auto mb-4 rounded-lg shadow-md">
                                     @endif
                                 </div>
-                            @else
-                                <!-- Tampilkan form untuk menjawab -->
-                                <form action="{{ route('activities.answer', $activity->id) }}" method="POST">
-                                    @csrf
-                                    <div class="flex flex-col space-y-2">
-                                        <textarea name="answer" rows="3" class="w-full rounded-md border-gray-300 shadow-sm" placeholder="Ketik jawaban Anda di sini..." required></textarea>
-                                        <div class="self-end">
-                                            <button type="submit" class="px-4 py-2 font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                                                Kirim Jawaban
-                                            </button>
+                                
+                                @if($userAnswer)
+                                    <div class="p-4 {{ $userAnswer->is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }} rounded-lg">
+                                        <div class="flex items-center mb-2">
+                                            @if($userAnswer->is_correct)
+                                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                <span class="font-semibold text-green-800">Jawaban Benar</span>
+                                            @else
+                                                <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                                                </svg>
+                                                <span class="font-semibold text-red-800">Jawaban Salah</span>
+                                            @endif
                                         </div>
+                                        <p class="text-sm text-gray-600 mb-1">Jawaban Anda:</p>
+                                        <p class="font-medium">{{ $userAnswer->answer }}</p>
                                     </div>
-                                </form>
-                            @endif
-                        </div>
-                    @empty
-                        <div class="py-6 border-t border-gray-200">
-                            <p class="text-center text-gray-500">Belum ada aktivitas untuk materi ini.</p>
-                        </div>
-                    @endforelse
+                                @endif
+                            </div>
+                        @endforeach
+                    @else
+                        <!-- Quiz Form -->
+                        @if($material->activities->count() > 0)
+                            <form action="{{ route('materials.submit', $material->id) }}" method="POST" class="space-y-6">
+                                @csrf
+                                
+                                @foreach ($material->activities as $activity)
+                                    <div class="py-6 border-t border-gray-200">
+                                        <div class="mb-4">
+                                            <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ $loop->iteration }}. {{ $activity->question }}</h4>
+                                            @if($activity->image)
+                                                <img src="{{ asset('storage/' . $activity->image) }}" alt="Question Image" class="max-w-md h-auto mb-4 rounded-lg shadow-md">
+                                            @endif
+                                        </div>
+
+                                        @if($activity->type === 'multiple_choice')
+                                            <div class="space-y-2">
+                                                @if($activity->options && is_array($activity->options))
+                                                    @foreach($activity->options as $key => $option)
+                                                        <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                                            <input type="radio" name="answers[{{ $activity->id }}]" value="{{ $key }}" class="mr-3 text-indigo-600" required>
+                                                            <span>{{ $key }}. {{ $option }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                        
+                                        @elseif($activity->type === 'true_false')
+                                            <div class="space-y-2">
+                                                <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                                    <input type="radio" name="answers[{{ $activity->id }}]" value="true" class="mr-3 text-indigo-600" required>
+                                                    <span>Benar</span>
+                                                </label>
+                                                <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                                    <input type="radio" name="answers[{{ $activity->id }}]" value="false" class="mr-3 text-indigo-600" required>
+                                                    <span>Salah</span>
+                                                </label>
+                                            </div>
+                                        
+                                        @elseif($activity->type === 'fill_in_blank')
+                                            <div>
+                                                <input type="text" name="answers[{{ $activity->id }}]" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan jawaban Anda..." required>
+                                            </div>
+                                        
+                                        @else
+                                            <div>
+                                                <textarea name="answers[{{ $activity->id }}]" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tulis jawaban Anda di sini..." required></textarea>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                                
+                                <div class="flex justify-center py-6">
+                                    <button type="submit" class="px-8 py-3 bg-indigo-600 text-white font-semibold text-lg rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                                        Submit Semua Jawaban
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            <div class="py-8 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                <p class="mt-2 text-gray-500">Belum ada aktivitas untuk materi ini.</p>
+                            </div>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>

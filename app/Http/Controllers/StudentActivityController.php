@@ -31,9 +31,51 @@ class StudentActivityController extends Controller
         ]);
 
         $user = Auth::user();
+        $userAnswer = $request->input('answer');
+        
+        // Get correct answer - handle both string and array formats
+        $correctAnswer = $activity->correct_answer;
+        if (is_array($correctAnswer)) {
+            $correctAnswer = $correctAnswer[0] ?? '';
+        }
+        
+        // Check if answer is correct
+        $isCorrect = false;
+        $score = 0;
+        
+        if ($activity->type === 'multiple_choice') {
+            // For multiple choice, compare the selected option key
+            $isCorrect = trim(strtolower($userAnswer)) === trim(strtolower($correctAnswer));
+        } elseif ($activity->type === 'true_false') {
+            // For true/false, compare boolean values
+            $userBool = $userAnswer === 'true' ? 'true' : 'false';
+            $correctBool = trim(strtolower($correctAnswer)) === 'true' ? 'true' : 'false';
+            $isCorrect = $userBool === $correctBool;
+        } elseif ($activity->type === 'fill_in_blank') {
+            // For fill in blank, check if answer matches (case insensitive)
+            $userAnswerClean = trim(strtolower($userAnswer));
+            $correctAnswerClean = trim(strtolower($correctAnswer));
+            
+            // Check exact match or if correct answer contains multiple acceptable answers
+            if (strpos($correctAnswerClean, '|') !== false) {
+                $acceptableAnswers = explode('|', $correctAnswerClean);
+                foreach ($acceptableAnswers as $acceptable) {
+                    if ($userAnswerClean === trim($acceptable)) {
+                        $isCorrect = true;
+                        break;
+                    }
+                }
+            } else {
+                $isCorrect = $userAnswerClean === $correctAnswerClean;
+            }
+        } else {
+            // For essay type, mark as correct by default (manual review needed)
+            $isCorrect = true;
+        }
+        
+        $score = $isCorrect ? 100 : 0;
 
-        // Gunakan updateOrCreate untuk menyimpan atau memperbarui jawaban.
-        // Ini mencegah siswa mengirim jawaban ganda untuk aktivitas yang sama.
+        // Save or update answer
         StudentHotsActivityAnswer::updateOrCreate(
             [
                 'user_id' => $user->id,
@@ -41,11 +83,108 @@ class StudentActivityController extends Controller
             ],
             [
                 'answer' => $request->input('answer'),
+                'is_correct' => $isCorrect,
             ]
         );
 
-        // Kembali ke halaman materi setelah menjawab
+        $message = $isCorrect ? 
+            '✅ Jawaban benar! Selamat, Anda mendapat skor 100!' : 
+            '❌ Jawaban kurang tepat. Skor: 0. Coba pelajari materi lagi!';
+            
         return redirect()->route('materials.show', $activity->reading_material_id)
-                         ->with('success', 'Jawaban Anda berhasil disimpan!');
+                         ->with('success', $message);
+    }
+
+    public function progress()
+    {
+        $user = Auth::user();
+        $materials = \App\Models\ReadingMaterial::with(['activities', 'chapter', 'genre'])->get();
+        $userAnswers = $user->answers()->with('hotsActivity.readingMaterial')->get();
+        
+        return view('students.progress', compact('materials', 'userAnswers'));
+    }
+
+    public function recent()
+    {
+        $user = Auth::user();
+        $recentAnswers = $user->answers()
+            ->with(['hotsActivity.readingMaterial'])
+            ->latest()
+            ->paginate(20);
+            
+        return view('students.recent', compact('recentAnswers'));
+    }
+
+    public function submitMaterial(Request $request, $materialId)
+    {
+        $request->validate([
+            'answers' => 'required|array',
+            'answers.*' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $material = \App\Models\ReadingMaterial::with('activities')->findOrFail($materialId);
+        $answers = $request->input('answers');
+        $correctCount = 0;
+        $totalCount = 0;
+
+        foreach ($material->activities as $activity) {
+            if (isset($answers[$activity->id])) {
+                $userAnswer = $answers[$activity->id];
+                $correctAnswer = $activity->correct_answer;
+                
+                if (is_array($correctAnswer)) {
+                    $correctAnswer = $correctAnswer[0] ?? '';
+                }
+                
+                $isCorrect = false;
+                
+                if ($activity->type === 'multiple_choice') {
+                    $isCorrect = trim(strtolower($userAnswer)) === trim(strtolower($correctAnswer));
+                } elseif ($activity->type === 'true_false') {
+                    $userBool = $userAnswer === 'true' ? 'true' : 'false';
+                    $correctBool = trim(strtolower($correctAnswer)) === 'true' ? 'true' : 'false';
+                    $isCorrect = $userBool === $correctBool;
+                } elseif ($activity->type === 'fill_in_blank') {
+                    $userAnswerClean = trim(strtolower($userAnswer));
+                    $correctAnswerClean = trim(strtolower($correctAnswer));
+                    
+                    if (strpos($correctAnswerClean, '|') !== false) {
+                        $acceptableAnswers = explode('|', $correctAnswerClean);
+                        foreach ($acceptableAnswers as $acceptable) {
+                            if ($userAnswerClean === trim($acceptable)) {
+                                $isCorrect = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        $isCorrect = $userAnswerClean === $correctAnswerClean;
+                    }
+                } else {
+                    $isCorrect = true;
+                }
+                
+                if ($isCorrect) {
+                    $correctCount++;
+                }
+                $totalCount++;
+                
+                StudentHotsActivityAnswer::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'hots_activity_id' => $activity->id,
+                    ],
+                    [
+                        'answer' => $userAnswer,
+                        'is_correct' => $isCorrect,
+                    ]
+                );
+            }
+        }
+        
+        $score = $totalCount > 0 ? round(($correctCount / $totalCount) * 100) : 0;
+        
+        return redirect()->route('materials.show', $materialId)
+                         ->with('success', "✅ Semua jawaban berhasil disimpan! Skor Anda: {$score}% ({$correctCount}/{$totalCount} benar)");
     }
 }

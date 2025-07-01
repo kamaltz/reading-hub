@@ -11,250 +11,349 @@
                 <div class="text-gray-100">
                     {{-- Tampilan untuk Admin --}}
                     @if (Auth::user()->isAdmin())
-                        <!-- Statistics Cards -->
-                        <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
-                            <div class="p-6 bg-blue-600 rounded-lg shadow-lg">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-blue-800 rounded-full">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"></path>
+                        <!-- Key Metrics Cards -->
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                            <!-- Student Engagement -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Tingkat Partisipasi</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $studentsCount > 0 ? round(($activeStudents / $studentsCount) * 100, 1) : 0 }}%</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.196-2.121M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                         </svg>
                                     </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-blue-100">Total Siswa</p>
-                                        <p class="text-2xl font-bold text-white">{{ $studentsCount }}</p>
-                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">{{ $activeStudents }} dari {{ $studentsCount }} siswa aktif</div>
                                 </div>
                             </div>
-                            
-                            <div class="p-6 bg-green-600 rounded-lg shadow-lg">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-green-800 rounded-full">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <!-- Learning Success Rate -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Tingkat Keberhasilan</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $averageScore }}%</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">{{ $correctAnswers }} dari {{ $totalAnswers }} jawaban benar</div>
+                                </div>
+                            </div>
+
+                            <!-- Content Completion -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Materi Tersedia</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $materialsCount }}</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path>
                                         </svg>
                                     </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-green-100">Total Materi</p>
-                                        <p class="text-2xl font-bold text-white">{{ $materialsCount }}</p>
-                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">{{ $activitiesCount }} aktivitas pembelajaran</div>
                                 </div>
                             </div>
-                            
-                            <div class="p-6 bg-purple-600 rounded-lg shadow-lg">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-purple-800 rounded-full">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                        </svg>
+
+                            <!-- Activity Volume -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Total Interaksi</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $totalAnswers }}</p>
                                     </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-purple-100">Total Aktivitas</p>
-                                        <p class="text-2xl font-bold text-white">{{ $activitiesCount }}</p>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="p-6 bg-orange-600 rounded-lg shadow-lg">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-orange-800 rounded-full">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-orange-100">Rata-rata Skor</p>
-                                        <p class="text-2xl font-bold text-white">{{ $averageScore }}%</p>
-                                    </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">Jawaban siswa pada aktivitas</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Progress Overview -->
-                        <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
-                            <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
-                                <h3 class="mb-4 text-lg font-semibold text-white">Progres Keseluruhan</h3>
-                                <div class="space-y-4">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-300">Siswa Aktif</span>
-                                        <span class="text-white font-semibold">{{ $activeStudents }}/{{ $studentsCount }}</span>
-                                    </div>
-                                    <div class="w-full bg-gray-700 rounded-full h-2">
-                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $studentsCount > 0 ? ($activeStudents / $studentsCount) * 100 : 0 }}%"></div>
-                                    </div>
-                                    
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-300">Total Jawaban</span>
-                                        <span class="text-white font-semibold">{{ $totalAnswers }}</span>
-                                    </div>
-                                    
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-300">Jawaban Benar</span>
-                                        <span class="text-green-400 font-semibold">{{ $correctAnswers }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
-                                <h3 class="mb-4 text-lg font-semibold text-white">Siswa Terbaru</h3>
-                                <div class="space-y-3">
-                                    @forelse($latestStudents as $student)
-                                        <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                                            <div>
-                                                <p class="text-white font-medium">{{ $student->name }}</p>
-                                                <p class="text-sm text-gray-400">{{ $student->email }}</p>
+                        <!-- Detailed Analytics -->
+                        <div class="grid gap-6 md:grid-cols-2 mb-6">
+                            <!-- Learning Progress Chart -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Progres Pembelajaran</h3>
+                                    <div class="space-y-4">
+                                        <div class="space-y-2">
+                                            <div class="flex items-center justify-between text-sm">
+                                                <span class="text-gray-600">Siswa Aktif</span>
+                                                <span class="font-medium text-gray-900">{{ $activeStudents }}/{{ $studentsCount }}</span>
                                             </div>
-                                            <span class="text-xs text-gray-500">{{ $student->created_at->diffForHumans() }}</span>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {{ $studentsCount > 0 ? ($activeStudents / $studentsCount) * 100 : 0 }}%"></div>
+                                            </div>
                                         </div>
-                                    @empty
-                                        <p class="text-gray-400">Belum ada siswa terdaftar.</p>
-                                    @endforelse
+                                        
+                                        <div class="space-y-2">
+                                            <div class="flex items-center justify-between text-sm">
+                                                <span class="text-gray-600">Tingkat Keberhasilan</span>
+                                                <span class="font-medium text-gray-900">{{ $averageScore }}%</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: {{ $averageScore }}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-green-600">{{ $correctAnswers }}</div>
+                                                <div class="text-xs text-gray-500">Jawaban Benar</div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-red-600">{{ $totalAnswers - $correctAnswers }}</div>
+                                                <div class="text-xs text-gray-500">Jawaban Salah</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Students -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Siswa Terbaru</h3>
+                                    <div class="space-y-3">
+                                        @forelse($latestStudents as $student)
+                                            <div class="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <span class="text-sm font-medium text-blue-600">{{ substr($student->name, 0, 1) }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $student->name }}</p>
+                                                    <p class="text-xs text-gray-500 truncate">{{ $student->email }}</p>
+                                                </div>
+                                                <div class="text-xs text-gray-400">{{ $student->created_at->diffForHumans() }}</div>
+                                            </div>
+                                        @empty
+                                            <div class="text-center py-6">
+                                                <p class="text-gray-500 text-sm">Belum ada siswa terdaftar</p>
+                                            </div>
+                                        @endforelse
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Recent Activity -->
-                        <div class="p-6 bg-gray-800 rounded-lg shadow-lg">
-                            <h3 class="mb-4 text-lg font-semibold text-white">Aktivitas Terbaru</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full">
-                                    <thead>
-                                        <tr class="border-b border-gray-700">
-                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Siswa</th>
-                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Materi</th>
-                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Status</th>
-                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-300">Waktu</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-700">
-                                        @forelse($recentAnswers as $answer)
-                                            <tr>
-                                                <td class="px-4 py-3 text-sm text-white">{{ $answer->user->name }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-300">{{ $answer->hotsActivity->readingMaterial->title ?? 'N/A' }}</td>
-                                                <td class="px-4 py-3">
-                                                    @if($answer->is_correct)
-                                                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Benar</span>
-                                                    @else
-                                                        <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Salah</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-400">{{ $answer->created_at->diffForHumans() }}</td>
+                        <!-- Recent Activity Table -->
+                        <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                            <div class="p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Aktivitas Pembelajaran Terbaru</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead>
+                                            <tr class="border-b border-gray-200">
+                                                <th class="text-left py-3 px-4 font-medium text-gray-600 text-sm">Siswa</th>
+                                                <th class="text-left py-3 px-4 font-medium text-gray-600 text-sm">Materi</th>
+                                                <th class="text-left py-3 px-4 font-medium text-gray-600 text-sm">Status</th>
+                                                <th class="text-left py-3 px-4 font-medium text-gray-600 text-sm">Waktu</th>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="px-4 py-3 text-center text-gray-400">Belum ada aktivitas.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            @forelse($recentAnswers as $answer)
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="py-3 px-4">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                                                <span class="text-xs font-medium text-gray-600">{{ substr($answer->user->name, 0, 1) }}</span>
+                                                            </div>
+                                                            <span class="text-sm font-medium text-gray-900">{{ $answer->user->name }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3 px-4 text-sm text-gray-600">{{ Str::limit($answer->hotsActivity->readingMaterial->title ?? 'N/A', 30) }}</td>
+                                                    <td class="py-3 px-4">
+                                                        @if($answer->is_correct)
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Benar</span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Salah</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="py-3 px-4 text-sm text-gray-500">{{ $answer->created_at->diffForHumans() }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="py-6 text-center text-gray-500 text-sm">Belum ada aktivitas pembelajaran</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     {{-- Tampilan untuk Siswa --}}
                     @else
-                        {{-- 1. Bagian Statistik Progres --}}
-                        <div class="mb-8">
-                            <h3 class="mb-4 text-lg font-semibold">Progres Belajar Saya</h3>
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <div class="p-4 bg-green-100 rounded-lg shadow">
-                                    <p class="text-sm text-gray-600">Aktivitas yang Dicoba</p>
-                                    <p class="text-2xl font-bold">{{ $totalAttemptedActivities }}</p>
+                        <!-- Student Progress Statistics -->
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                            <!-- Activities Attempted -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Aktivitas Dicoba</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $totalAttemptedActivities }}</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                        </svg>
+                                    </div>
                                 </div>
-                                <div class="p-4 bg-blue-100 rounded-lg shadow">
-                                    <p class="text-sm text-gray-600">Jawaban Benar</p>
-                                    <p class="text-2xl font-bold">{{ $completedActivities }}</p>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">dari {{ $totalAvailableActivities }} total aktivitas</div>
                                 </div>
-                                <div class="p-4 bg-yellow-100 rounded-lg shadow">
-                                    <p class="text-sm text-gray-600">Total Aktivitas Tersedia</p>
-                                    <p class="text-2xl font-bold">{{ $totalAvailableActivities }}</p>
+                            </div>
+
+                            <!-- Correct Answers -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Jawaban Benar</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $completedActivities }}</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">{{ $totalAttemptedActivities > 0 ? round(($completedActivities / $totalAttemptedActivities) * 100, 1) : 0 }}% tingkat keberhasilan</div>
+                                </div>
+                            </div>
+
+                            <!-- Materials Progress -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Materi Dipelajari</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $materials->where(function($material) use ($userAnsweredActivityIds) { return $material->activities->whereIn('id', $userAnsweredActivityIds)->count() > 0; })->count() }}</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">dari {{ $materials->count() }} materi tersedia</div>
+                                </div>
+                            </div>
+
+                            <!-- Overall Progress -->
+                            <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-muted-foreground text-gray-600">Progres Keseluruhan</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ $totalAvailableActivities > 0 ? round(($totalAttemptedActivities / $totalAvailableActivities) * 100, 1) : 0 }}%</p>
+                                    </div>
+                                    <div class="h-4 w-4 text-muted-foreground">
+                                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-xs text-muted-foreground text-gray-500">pembelajaran yang diselesaikan</div>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- 2. Bagian Filter Materi --}}
-                        <div class="p-6 mb-6 bg-gray-50 rounded-lg">
-                            <form action="{{ route('dashboard') }}" method="GET">
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                    <div>
-                                        <label for="chapter_id" class="block text-sm font-medium text-gray-700">Filter berdasarkan Bab</label>
-                                        <select name="chapter_id" id="chapter_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <!-- Materials Grid -->
+                        <div class="rounded-lg border bg-card text-card-foreground shadow-sm bg-white border-gray-200 mb-6">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Materi Pembelajaran</h3>
+                                    <div class="flex space-x-2">
+                                        <select id="chapterFilter" class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                             <option value="">Semua Bab</option>
                                             @foreach ($chapters as $chapter)
-                                                <option value="{{ $chapter->id }}" {{ request('chapter_id') == $chapter->id ? 'selected' : '' }}>
-                                                    {{ $chapter->title }}
-                                                </option>
+                                                <option value="{{ $chapter->id }}">{{ $chapter->title }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
-                                    <div>
-                                        <label for="genre_id" class="block text-sm font-medium text-gray-700">Filter berdasarkan Genre</label>
-                                        <select name="genre_id" id="genre_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <select id="genreFilter" class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                             <option value="">Semua Genre</option>
                                             @foreach ($genres as $genre)
-                                                <option value="{{ $genre->id }}" {{ request('genre_id') == $genre->id ? 'selected' : '' }}>
-                                                    {{ $genre->name }}
-                                                </option>
+                                                <option value="{{ $genre->id }}">{{ $genre->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="flex items-end space-x-2">
-                                        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md border border-transparent shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Filter
-                                        </button>
-                                        <a href="{{ route('dashboard') }}" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Reset
-                                        </a>
-                                    </div>
                                 </div>
-                            </form>
-                        </div>
-
-                        {{-- 3. Bagian Daftar Materi Pembelajaran --}}
-                        <h3 class="mb-4 text-xl font-semibold text-gray-800">Materi Pembelajaran</h3>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            @forelse ($materials as $material)
-                                @php
-                                    // Kalkulasi progres materi secara efisien menggunakan data dari controller
-                                    $totalActivitiesInMaterial = $material->activities->count();
-                                    $answeredActivitiesInMaterial = $material->activities
-                                        ->whereIn('id', $userAnsweredActivityIds)
-                                        ->count();
-                                    $progress = ($totalActivitiesInMaterial > 0) ? round(($answeredActivitiesInMaterial / $totalActivitiesInMaterial) * 100) : 0;
-                                @endphp
-                                <div class="flex overflow-hidden flex-col justify-between bg-white rounded-lg shadow-md transition hover:shadow-xl">
-                                    <div class="p-6">
-                                        <h4 class="mb-2 text-lg font-bold">{{ $material->title }}</h4>
-                                        <p class="mb-1 text-xs text-gray-500">
-                                            Bab: {{ $material->chapter->title ?? 'N/A' }} | Genre: {{ $material->chapter->genre->name ?? 'N/A' }}
-                                        </p>
-                                        <p class="mb-4 h-20 text-sm text-gray-600">{{ Str::limit($material->description, 120) }}</p>
-
-                                        @if ($totalActivitiesInMaterial > 0)
-                                            <div>
-                                                <div class="flex justify-between mb-1">
-                                                    <span class="text-sm font-medium text-gray-700">Progres</span>
-                                                    <span class="text-sm font-medium text-gray-700">{{ $answeredActivitiesInMaterial }} / {{ $totalActivitiesInMaterial }} Aktivitas</span>
-                                                </div>
-                                                <div class="w-full h-2.5 bg-gray-200 rounded-full">
-                                                    <div class="h-2.5 bg-blue-600 rounded-full" style="width: {{ $progress }}%"></div>
-                                                </div>
+                                
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                    @forelse ($materials as $material)
+                                        @php
+                                            $totalActivitiesInMaterial = $material->activities->count();
+                                            $answeredActivitiesInMaterial = $material->activities->whereIn('id', $userAnsweredActivityIds)->count();
+                                            $correctAnswersInMaterial = $material->activities->filter(function($activity) use ($userAnsweredActivityIds) {
+                                                return in_array($activity->id, $userAnsweredActivityIds) && 
+                                                       Auth::user()->answers->where('hots_activity_id', $activity->id)->where('is_correct', true)->count() > 0;
+                                            })->count();
+                                            $progress = ($totalActivitiesInMaterial > 0) ? round(($answeredActivitiesInMaterial / $totalActivitiesInMaterial) * 100) : 0;
+                                            $score = ($answeredActivitiesInMaterial > 0) ? round(($correctAnswersInMaterial / $answeredActivitiesInMaterial) * 100) : 0;
+                                        @endphp
+                                        <div class="material-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow" data-chapter="{{ $material->chapter_id }}" data-genre="{{ $material->genre_id }}">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <h4 class="font-semibold text-gray-900 text-sm truncate pr-2 flex-1" title="{{ $material->title }}">{{ $material->title }}</h4>
+                                                @if($progress > 0)
+                                                    <span class="text-xs px-2 py-1 rounded-full whitespace-nowrap {{ $progress == 100 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                                        {{ $progress }}%
+                                                    </span>
+                                                @endif
                                             </div>
-                                        @else
-                                             <p class="text-sm italic text-gray-500">Belum ada aktivitas untuk materi ini.</p>
-                                        @endif
-                                    </div>
-                                    <div class="px-6 py-4 bg-gray-50">
-                                        <a href="{{ route('materials.show', $material) }}" class="inline-block px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                                            Lihat Materi
-                                        </a>
-                                    </div>
+                                            
+                                            <p class="text-xs text-gray-500 mb-3 truncate">{{ $material->chapter->title ?? 'N/A' }} • {{ $material->genre->name ?? 'N/A' }}</p>
+                                            
+                                            @if($material->description)
+                                                <p class="text-xs text-gray-600 mb-3 line-clamp-2 overflow-hidden" title="{{ $material->description }}">{{ $material->description }}</p>
+                                            @endif
+                                            
+                                            @if ($totalActivitiesInMaterial > 0)
+                                                <div class="space-y-2 mb-4">
+                                                    <div class="flex justify-between text-xs text-gray-600">
+                                                        <span>Progres: {{ $answeredActivitiesInMaterial }}/{{ $totalActivitiesInMaterial }}</span>
+                                                        <span>Nilai: {{ $score }}%</span>
+                                                    </div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {{ $progress }}%"></div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <p class="text-xs text-gray-500 mb-4">Belum ada aktivitas</p>
+                                            @endif
+                                            
+                                            <a href="{{ route('materials.show', $material) }}" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
+                                                Belajar Sekarang
+                                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    @empty
+                                        <div class="col-span-full text-center py-8">
+                                            <p class="text-gray-500">Belum ada materi pembelajaran tersedia</p>
+                                        </div>
+                                    @endforelse
                                 </div>
-                            @empty
-                                <div class="col-span-full">
-                                    <div class="p-6 text-center text-gray-500 bg-white rounded-lg shadow-md">
-                                        <p>Tidak ada materi yang ditemukan sesuai dengan filter Anda.</p>
-                                    </div>
-                                </div>
-                            @endforelse
+                            </div>
                         </div>
                     @endif
                 </div>
