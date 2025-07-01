@@ -42,7 +42,7 @@
                         <!-- Konten -->
                         <div class="mb-4">
                             <label for="content" class="block text-sm font-medium text-gray-700">Konten</label>
-                            <textarea name="content" id="content" rows="10" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" required>{{ old('content', $material->content) }}</textarea>
+                            <textarea name="content" rows="10" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm tinymce-editor" required>{{ old('content', $material->content) }}</textarea>
                             @error('content') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                         </div>
 
@@ -80,4 +80,13 @@
             </div>
         </div>
     </div>
+    @push('scripts')
+<script>
+  tinymce.init({
+    selector: 'textarea#content-editor',
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+  });
+</script>
+@endpush
 </x-app-layout>

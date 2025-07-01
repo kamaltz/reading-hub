@@ -8,6 +8,9 @@
                 <a href="{{ route('admin.students.import.form') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50">
                     Import Siswa
                 </a>
+                    <a href="{{ route('admin.students.generate') }}" class="inline-flex items-center px-4 py-2 mr-2 text-xs font-semibold tracking-widest text-white uppercase bg-green-600 rounded-md border border-transparent ring-green-300 transition duration-150 ease-in-out hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring disabled:opacity-25">
+        Generator Massal
+    </a>
                 <a href="{{ route('admin.students.create') }}" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-700">
                     + Tambah Siswa
                 </a>
