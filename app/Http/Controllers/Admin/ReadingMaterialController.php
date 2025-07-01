@@ -8,6 +8,7 @@ use App\Models\Chapter;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ReadingMaterialController extends Controller
 {
@@ -121,5 +122,115 @@ class ReadingMaterialController extends Controller
         $url = asset('storage/' . $path);
 
         return response()->json(['location' => $url]);
+    }
+
+    public function generateWithAI(Request $request)
+    {
+        $request->headers->set('Accept', 'application/json');
+        
+        try {
+            $validated = $request->validate([
+                'prompt' => 'required|string|max:1000',
+                'genre_id' => 'required|integer|exists:genres,id',
+            ]);
+
+            $genre = Genre::find($validated['genre_id']);
+            
+            if (!$genre) {
+                return response()->json(['error' => 'Genre not found'], 404);
+            }
+            
+            $aiService = new \App\Services\AIContentService();
+            $result = $aiService->generateFromPrompt($validated['prompt'], $genre->name);
+            
+            if (isset($result['error'])) {
+                return response()->json(['error' => $result['error']], 500);
+            }
+
+            return response()->json([
+                'title' => $result['title'] ?? 'Generated Content',
+                'content' => $result['content'] ?? '<p>Content generation failed</p>'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('AI Generation Error: ' . $e->getMessage());
+            Log::error('API Key Status: ' . (env('GEMINI_API_KEY') ? 'Found' : 'Not found'));
+            return response()->json([
+                'title' => 'Error Debug',
+                'content' => '<h3>Debug Info</h3><p>Error: ' . $e->getMessage() . '</p><p>API Key: ' . (env('GEMINI_API_KEY') ? 'Configured' : 'Missing') . '</p>'
+            ]);
+        }
+    }
+
+    public function uploadPDF(Request $request)
+    {
+        $request->headers->set('Accept', 'application/json');
+        
+        try {
+            $validated = $request->validate([
+                'pdf_file' => 'required|file|mimes:pdf|max:10240',
+                'genre_id' => 'required|integer|exists:genres,id',
+                'prompt' => 'required|string|max:500',
+            ]);
+
+            $file = $request->file('pdf_file');
+            $genre = Genre::find($validated['genre_id']);
+            
+            if (!$genre) {
+                return response()->json(['error' => 'Genre not found'], 404);
+            }
+
+            // Process PDF with Gemini's native PDF support
+            $pdfContent = file_get_contents($file->getRealPath());
+            $base64Pdf = base64_encode($pdfContent);
+            
+            $aiService = new \App\Services\AIContentService();
+            $result = $aiService->processPDFWithPrompt($base64Pdf, $validated['prompt'], $genre->name);
+            
+            if (isset($result['error'])) {
+                return response()->json(['error' => $result['error']], 500);
+            }
+
+            return response()->json([
+                'title' => $result['title'] ?? 'Generated from PDF',
+                'content' => $result['content'] ?? '<p>PDF processing failed</p>',
+                'questions' => $result['questions'] ?? []
+            ]);
+        } catch (\Exception $e) {
+            Log::error('PDF Upload Error: ' . $e->getMessage());
+            return response()->json(['error' => 'PDF processing failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function extractPDFText(string $filePath): string
+    {
+        try {
+            // Simple text extraction from PDF
+            $content = file_get_contents($filePath);
+            
+            // Extract text between parentheses (basic PDF text extraction)
+            preg_match_all('/\(([^)]+)\)/', $content, $matches);
+            $text = implode(' ', $matches[1] ?? []);
+            
+            // Clean up the text
+            $text = preg_replace('/[^\w\s.,!?-]/', ' ', $text);
+            $text = preg_replace('/\s+/', ' ', $text);
+            
+            return trim($text) ?: 'Unable to extract readable text from PDF';
+        } catch (\Exception $e) {
+            Log::error('PDF extraction error: ' . $e->getMessage());
+            return 'PDF text extraction failed';
+        }
+    }
+
+    public function testAI()
+    {
+        $aiService = new \App\Services\AIContentService();
+        $result = $aiService->generateMaterialContent('test topic', 'narrative');
+        
+        return response()->json([
+            'api_key_configured' => !empty(env('GEMINI_API_KEY')),
+            'api_key_length' => strlen(env('GEMINI_API_KEY') ?? ''),
+            'result' => $result
+        ]);
     }
 }

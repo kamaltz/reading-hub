@@ -368,8 +368,10 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        /* Remove any scroll.js dependencies */
+        .scroll-element { display: none !important; }
+    </style>
     
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
@@ -539,37 +541,32 @@
                 animateHero();
             }
 
-            // --- GSAP Animations ---
-            gsap.registerPlugin(ScrollTrigger);
-            gsap.from(".hero-element", { y: 50, opacity: 0, duration: 1.2, stagger: 0.2, ease: "expo.out" });
-            
-            document.querySelectorAll("section").forEach((section) => {
-                 gsap.from(section.querySelectorAll(".section-title, .feature-card, .cta-section"), {
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 70%",
-                        toggleActions: "play none none none"
-                    },
-                    y: 60,
-                    opacity: 0,
-                    duration: 1,
-                    ease: "power3.out",
-                    stagger: 0.2
-                });
+            // Simple animations without deprecated libraries
+            document.querySelectorAll('.hero-element').forEach((el, i) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 1.2s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 200);
             });
-
-            gsap.utils.toArray(".parallax-layer").forEach(layer => {
-                const speed = layer.dataset.speed;
-                gsap.to(layer, {
-                    y: (i, target) => -ScrollTrigger.maxScroll(window) * speed,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: 'body',
-                        start: "top top",
-                        end: "bottom top",
-                        scrub: 1,
+            
+            // Intersection Observer for scroll animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
                 });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.section-title, .feature-card, .cta-section, .testimonial-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(60px)';
+                el.style.transition = 'all 1s ease';
+                observer.observe(el);
             });
 
             document.querySelectorAll('.interactive-card').forEach(card => {
@@ -577,26 +574,14 @@
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left - rect.width / 2;
                     const y = e.clientY - rect.top - rect.height / 2;
-                    gsap.to(card, { rotationX: -y / 30, rotationY: x / 30, transformPerspective: 1000, ease: "power1.out", duration: 0.8 });
+                    card.style.transform = `perspective(1000px) rotateX(${-y / 30}deg) rotateY(${x / 30}deg)`;
                 });
                 card.addEventListener('mouseleave', () => {
-                    gsap.to(card, { rotationX: 0, rotationY: 0, ease: "power1.out", duration: 1 });
+                    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
                 });
             });
             
-            // Testimonial cards animation
-            const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, observerOptions);
-            
-            document.querySelectorAll('.testimonial-card').forEach(card => {
-                observer.observe(card);
-            });
+
         });
         
         // Game functionality

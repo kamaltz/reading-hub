@@ -62,6 +62,13 @@ Route::prefix('admin')
         
         Route::resource('materials', ReadingMaterialController::class);
         Route::post('materials/upload-image', [ReadingMaterialController::class, 'uploadImage'])->name('materials.upload-image');
+        
+        // API routes with JSON response middleware
+        Route::middleware('api')->group(function () {
+            Route::post('materials/generate-ai', [ReadingMaterialController::class, 'generateWithAI'])->name('materials.generate-ai');
+            Route::post('materials/upload-pdf', [ReadingMaterialController::class, 'uploadPDF'])->name('materials.upload-pdf');
+            Route::get('materials/test-ai', [ReadingMaterialController::class, 'testAI'])->name('materials.test-ai');
+        });
         Route::resource('genres', GenreController::class);
         Route::resource('chapters', ChapterController::class);
         
