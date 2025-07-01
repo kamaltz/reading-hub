@@ -13,6 +13,131 @@
             background-color: #f0f4f8;
             color: #1a202c;
             overflow-x: hidden;
+            cursor: none;
+        }
+        
+        .rocket-cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.8;
+        }
+        
+        .game-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 250px;
+        }
+        
+        .game-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        
+        .game-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .snake-game {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: #f8f9ff;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .feature-enhanced {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-enhanced::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+        
+        .feature-enhanced:hover::before {
+            opacity: 1;
+            animation: shimmer 1.5s ease-in-out;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .floating-cta {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+        
+        .testimonial-card.visible {
+            transform: translateY(0);
+            opacity: 1;
         }
         #background-canvas, #interactive-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
@@ -52,6 +177,21 @@
 <body class="antialiased">
     <canvas id="background-canvas"></canvas>
     <canvas id="interactive-canvas"></canvas>
+    
+    <!-- Rocket Cursor -->
+    <div class="rocket-cursor">🚀</div>
+    
+    
+    <!-- Game Container -->
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <h3 class="mb-4 text-lg font-bold text-center">Snake Game</h3>
+        <canvas class="snake-game" id="snakeGame" width="200" height="200"></canvas>
+        <div class="mt-4 text-center">
+            <div class="text-sm">Score: <span id="score">0</span></div>
+            <button onclick="startGame()" class="px-4 py-2 mt-2 text-sm text-white bg-indigo-600 rounded-lg">Start Game</button>
+        </div>
+        <div class="mt-2 text-xs text-center text-gray-600">Use arrow keys to play</div>
+    </div>
 
     <div class="content-wrapper">
         <header class="fixed inset-x-0 top-0 z-50">
@@ -87,11 +227,36 @@
             </div>
         </section>
 
+        <!-- Stats Section -->
+        <section class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600">
+            <div class="px-6 mx-auto max-w-7xl">
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold">50+</div>
+                        <div class="text-sm opacity-90">Siswa Aktif</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold">20+</div>
+                        <div class="text-sm opacity-90">Materi Pembelajaran</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold">95%</div>
+                        <div class="text-sm opacity-90">Tingkat Kepuasan</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold">24/7</div>
+                        <div class="text-sm opacity-90">Akses Pembelajaran</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Section 2: Features -->
         <section id="features" class="py-24 sm:py-32">
             <div class="px-6 mx-auto max-w-7xl lg:px-8">
                 <div class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl section-title">Ekosistem Belajar yang Terstruktur</h2>
+                    <p class="mt-4 text-lg text-gray-600">Platform pembelajaran yang dirancang khusus untuk meningkatkan kemampuan literasi dan berpikir kritis</p>
                 </div>
                 <div class="grid grid-cols-1 gap-8 mt-16 md:grid-cols-3">
                     @php
@@ -102,7 +267,7 @@
                         ];
                     @endphp
                      @foreach ($features as $feature)
-                    <div class="p-8 text-center glass-card interactive-card feature-card">
+                    <div class="p-8 text-center glass-card interactive-card feature-card feature-enhanced">
                         <div class="flex justify-center items-center h-40">
                              <svg class="w-24 h-24 text-indigo-500 animated-svg-path" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">{!! $feature['svg'] !!}</svg>
                         </div>
@@ -114,14 +279,58 @@
             </div>
         </section>
 
+        <!-- Testimonials Section -->
+        <section class="py-24 bg-gray-50">
+            <div class="px-6 mx-auto max-w-7xl">
+                <div class="mb-16 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900">Apa Kata Mereka?</h2>
+                    <p class="mt-4 text-lg text-gray-600">Testimoni dari pengguna yang telah merasakan manfaatnya</p>
+                </div>
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+                    <div class="testimonial-card">
+                        <div class="flex items-center mb-4">
+                            <div class="flex justify-center items-center w-12 h-12 font-bold text-white bg-indigo-500 rounded-full">A</div>
+                            <div class="ml-4">
+                                <div class="font-semibold">Andi Pratama</div>
+                                <div class="text-sm text-gray-600">Siswa SMA</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"Platform ini sangat membantu saya memahami berbagai jenis teks. Soal-soal HOTS-nya menantang dan membuat saya berpikir lebih kritis."</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="flex items-center mb-4">
+                            <div class="flex justify-center items-center w-12 h-12 font-bold text-white bg-purple-500 rounded-full">S</div>
+                            <div class="ml-4">
+                                <div class="font-semibold">Sari Dewi</div>
+                                <div class="text-sm text-gray-600">Guru Bahasa Indonesia</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"Sebagai guru, saya terbantu dengan materi-materi yang tersedia. Siswa jadi lebih antusias belajar membaca dan menganalisis teks."</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="flex items-center mb-4">
+                            <div class="flex justify-center items-center w-12 h-12 font-bold text-white bg-pink-500 rounded-full">R</div>
+                            <div class="ml-4">
+                                <div class="font-semibold">Rudi Hermawan</div>
+                                <div class="text-sm text-gray-600">Mahasiswa</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"Fitur analitik progresnya sangat membantu saya melihat perkembangan kemampuan membaca. Recommended banget!"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Section 3: Final CTA -->
         <section id="cta" class="py-24 sm:py-32">
              <div class="isolate overflow-hidden relative px-6 py-24 mx-auto max-w-4xl text-center glass-card sm:px-16 cta-section">
                 <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                     Siap Menguasai Setiap Teks?
                 </h2>
-                <div class="flex justify-center items-center mt-10">
-                    <a href="{{ route('register') }}" class="px-6 py-3 text-base font-semibold text-white bg-indigo-600 rounded-full shadow-lg transition transform hover:bg-indigo-700 hover:scale-105">Mulai Belajar Gratis</a>
+                <p class="mt-4 text-lg text-gray-600">Bergabunglah dengan ribuan siswa yang telah meningkatkan kemampuan literasi mereka</p>
+                <div class="flex justify-center items-center mt-10 space-x-4">
+                    <a href="{{ route('register') }}" class="px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg transition transform floating-cta hover:scale-105">Mulai Belajar Gratis</a>
+                    <a href="{{ route('login') }}" class="px-8 py-4 text-lg font-semibold text-indigo-600 rounded-full border-2 border-indigo-600 transition hover:bg-indigo-600 hover:text-white">Masuk Sekarang</a>
                 </div>
              </div>
         </section>
@@ -219,10 +428,21 @@
             // --- Interactive Canvas (Meteors & Cursor Trail) ---
             const intCanvas = document.getElementById('interactive-canvas');
             const intCtx = intCanvas.getContext('2d');
-            let mouse = { x: -100, y: -100 }; let particles = []; let meteors = [];
+            let mouse = { x: -100, y: -100 }; let particles = []; let meteors = []; let trails = [];
             const resizeInt = () => { intCanvas.width = window.innerWidth; intCanvas.height = window.innerHeight; };
             window.addEventListener('resize', resizeInt); resizeInt();
-            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+            
+            // Rocket cursor and trail
+            const rocketCursor = document.querySelector('.rocket-cursor');
+            window.addEventListener('mousemove', e => { 
+                mouse.x = e.clientX; mouse.y = e.clientY;
+                rocketCursor.style.left = e.clientX + 'px';
+                rocketCursor.style.top = e.clientY + 'px';
+                
+                // Add trail
+                trails.push({ x: e.clientX, y: e.clientY, life: 1 });
+                if (trails.length > 20) trails.shift();
+            });
             
             class Particle {
                 constructor(x, y) {
@@ -255,6 +475,20 @@
             
             const animateInt = () => {
                 intCtx.clearRect(0, 0, width, height);
+                
+                // Draw cursor trail
+                for (let i = trails.length - 1; i >= 0; i--) {
+                    const trail = trails[i];
+                    intCtx.globalAlpha = trail.life;
+                    intCtx.fillStyle = `hsl(${200 + i * 10}, 70%, 60%)`;
+                    intCtx.beginPath();
+                    intCtx.arc(trail.x, trail.y, 3 * trail.life, 0, Math.PI * 2);
+                    intCtx.fill();
+                    trail.life -= 0.05;
+                    if (trail.life <= 0) trails.splice(i, 1);
+                }
+                intCtx.globalAlpha = 1;
+                
                 for(let i=0; i<3; i++) particles.push(new Particle(mouse.x, mouse.y));
                 for (let i = particles.length - 1; i >= 0; i--) {
                     particles[i].update(); particles[i].draw();
@@ -349,6 +583,117 @@
                     gsap.to(card, { rotationX: 0, rotationY: 0, ease: "power1.out", duration: 1 });
                 });
             });
+            
+            // Testimonial cards animation
+            const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.testimonial-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+        
+        // Game functionality
+        let gameRunning = false;
+        let snake = [{ x: 100, y: 100 }];
+        let food = { x: 150, y: 150 };
+        let direction = { x: 0, y: 0 };
+        let score = 0;
+        
+        function toggleGame() {
+            const container = document.getElementById('gameContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function startGame() {
+            if (gameRunning) return;
+            gameRunning = true;
+            snake = [{ x: 100, y: 100 }];
+            food = { x: 150, y: 150 };
+            direction = { x: 0, y: 0 };
+            score = 0;
+            document.getElementById('score').textContent = score;
+            gameLoop();
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            const canvas = document.getElementById('snakeGame');
+            const ctx = canvas.getContext('2d');
+            
+            // Move snake
+            const head = { x: snake[0].x + direction.x * 10, y: snake[0].y + direction.y * 10 };
+            
+            // Check collision with walls
+            if (head.x < 0 || head.x >= 200 || head.y < 0 || head.y >= 200) {
+                gameRunning = false;
+                alert('Game Over! Score: ' + score);
+                return;
+            }
+            
+            // Check collision with self
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameRunning = false;
+                alert('Game Over! Score: ' + score);
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            // Check food collision
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('score').textContent = score;
+                food = {
+                    x: Math.floor(Math.random() * 20) * 10,
+                    y: Math.floor(Math.random() * 20) * 10
+                };
+            } else {
+                snake.pop();
+            }
+            
+            // Draw game
+            ctx.fillStyle = '#f8f9ff';
+            ctx.fillRect(0, 0, 200, 200);
+            
+            // Draw snake
+            ctx.fillStyle = '#667eea';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x, segment.y, 10, 10);
+            });
+            
+            // Draw food
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(food.x, food.y, 10, 10);
+            
+            setTimeout(gameLoop, 150);
+        }
+        
+        // Game controls
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (direction.y === 0) direction = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    if (direction.y === 0) direction = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    if (direction.x === 0) direction = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (direction.x === 0) direction = { x: 1, y: 0 };
+                    break;
+            }
         });
     </script>
 </body>
