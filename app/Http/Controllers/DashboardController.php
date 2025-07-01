@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+// Import semua model dan class yang dibutuhkan
 use App\Models\User;
 use App\Models\Genre;
 use App\Models\Chapter;
@@ -9,21 +10,23 @@ use App\Models\HotsActivity;
 use App\Models\ReadingMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\View\View;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Menampilkan dashboard yang sesuai berdasarkan peran pengguna.
      *
      * @param Request $request
      * @return View
      */
-    public function __invoke(Request $request): View
+    public function index(Request $request): View
     {
         $user = Auth::user();
 
-        // Tampilan untuk Admin
+        // ===================================
+        // Tampilan untuk Pengguna Admin
+        // ===================================
         if ($user->isAdmin()) {
             $studentsCount = User::where('role', 'student')->count();
             $materialsCount = ReadingMaterial::count();
@@ -31,6 +34,7 @@ class DashboardController extends Controller
             $chaptersCount = Chapter::count();
             $latestStudents = User::where('role', 'student')->latest()->take(5)->get();
 
+            // Kirim semua data statistik ke view dashboard admin
             return view('dashboard', [
                 'studentsCount' => $studentsCount,
                 'materialsCount' => $materialsCount,
@@ -40,47 +44,31 @@ class DashboardController extends Controller
             ]);
         } 
         
-        // Tampilan untuk Siswa
+        // ===================================
+        // Tampilan untuk Pengguna Siswa
+        // ===================================
         else {
-            // --- Kalkulasi Data Statistik ---
-            $totalAvailableActivities = HotsActivity::count();
-            $userAnswersQuery = $user->answers(); // Ambil query builder untuk jawaban user
-            $totalAttemptedActivities = $userAnswersQuery->count();
-            $completedActivities = (clone $userAnswersQuery)->where('is_correct', true)->count();
-            
-            // Ambil semua ID aktivitas yang pernah dijawab user (untuk progress bar)
-            $userAnsweredActivityIds = (clone $userAnswersQuery)->pluck('hots_activity_id');
-
             // --- Logika untuk Filter Materi ---
-            $materialsQuery = ReadingMaterial::with(['activities', 'chapter.genre']); // Eager load
+            $materialsQuery = ReadingMaterial::with(['genre', 'chapter']); // Eager load relasi
 
-            // Filter berdasarkan chapter_id jika ada
+            // Filter berdasarkan chapter_id jika ada di request URL
             if ($request->filled('chapter_id')) {
                 $materialsQuery->where('chapter_id', $request->chapter_id);
             }
 
-            // Filter berdasarkan genre_id jika ada
+            // Filter berdasarkan genre_id jika ada di request URL
             if ($request->filled('genre_id')) {
-                $materialsQuery->whereHas('chapter', function ($query) use ($request) {
-                    $query->where('genre_id', $request->genre_id);
-                });
+                $materialsQuery->where('genre_id', $request->genre_id);
             }
 
-            $materials = $materialsQuery->latest()->get();
+            $materials = $materialsQuery->latest()->paginate(12); // Gunakan paginate untuk daftar materi
 
+            // Kirim semua data ke view dashboard siswa
             return view('dashboard', [
-                // Data Statistik
-                'totalAvailableActivities' => $totalAvailableActivities,
-                'totalAttemptedActivities' => $totalAttemptedActivities,
-                'completedActivities' => $completedActivities,
-                
                 // Data untuk Filter dan Daftar Materi
                 'genres' => Genre::all(),
                 'chapters' => Chapter::all(),
                 'materials' => $materials,
-
-                // Data untuk Kalkulasi Progress di View
-                'userAnsweredActivityIds' => $userAnsweredActivityIds,
             ]);
         }
     }

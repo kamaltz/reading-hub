@@ -36,20 +36,24 @@
 
                         {{-- Bagian Aksi Cepat Manajemen Siswa --}}
                         <div class="mt-8">
-                            <h3 class="text-lg font-semibold leading-6 text-gray-900">Manajemen Siswa</h3>
-                            <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
-                                <!-- Tombol Tambah Siswa Baru -->
-                                <a href="{{ route('admin.students.create') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
-                                    <p class="text-xl font-semibold text-indigo-600">Tambah Siswa Baru</p>
-                                    <p class="mt-1 text-sm text-gray-500">Menambahkan satu akun siswa secara manual.</p>
-                                </a>
-                                <!-- Tombol Import Siswa -->
-                                <a href="{{ route('admin.students.import.form') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm hover:bg-gray-50">
-                                    <p class="text-xl font-semibold text-green-600">Import & Generate Akun</p>
-                                    <p class="mt-1 text-sm text-gray-500">Menambahkan banyak siswa dari file spreadsheet.</p>
-                                </a>
+                        <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-gray-100">Manajemen Siswa</h3>
+                        <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3">
+                            <a href="{{ route('admin.students.create') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <p class="text-xl font-semibold text-indigo-600 dark:text-indigo-400">Tambah Siswa</p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Menambahkan satu akun siswa secara manual.</p>
+                            </a>
+                            
+                            <a href="{{ route('admin.students.generate') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <p class="text-xl font-semibold text-teal-600 dark:text-teal-400">Generator Akun</p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Membuat banyak akun dengan rentang ID.</p>
+                            </a>
+
+                            <a href="{{ route('admin.students.import.form') }}" class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <p class="text-xl font-semibold text-green-600 dark:text-green-400">Import dari File</p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Menambahkan siswa dari file spreadsheet.</p>
+                            </a>
                             </div>
-                        </div>
+                             </div>
                         
                         {{-- Bagian Aksi Cepat Manajemen Materi --}}
                         <div class="mt-8">

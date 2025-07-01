@@ -3,69 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Imports\StudentImport;
-use App\Models\HotsActivity;
-use App\Models\ReadingMaterial;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rule;
+use App\Imports\StudentImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
     /**
-     * Menampilkan daftar semua siswa dengan progress mereka.
+     * Menampilkan daftar semua siswa dengan paginasi.
      */
     public function index()
     {
-        // Ambil total semua aktivitas yang ada di sistem
-        $totalActivities = HotsActivity::count();
-
-        // PERBAIKAN: Menggunakan withCount untuk menghindari N+1 query
-        // Ini akan mengambil jumlah jawaban benar untuk setiap siswa dalam satu query efisien.
-        $students = User::where('role', 'student')
-            ->withCount(['answers as completed_activities_count' => function ($query) {
-                $query->where('is_correct', true);
-            }])
-            ->latest()
-            ->paginate(15); // Ganti get() dengan paginate() untuk performa
-
-        // Loop untuk menghitung persentase progress
-        foreach ($students as $student) {
-            if ($totalActivities > 0) {
-                $student->progress = round(($student->completed_activities_count / $totalActivities) * 100);
-            } else {
-                // Default 0% jika tidak ada aktivitas sama sekali
-                $student->progress = 0;
-            }
-        }
-
+        $students = User::where('role', 'student')->latest()->paginate(15);
         return view('admin.students.index', compact('students'));
     }
 
     /**
-     * Menampilkan halaman detail untuk memonitor progres seorang siswa.
-     */
-    public function show(User $student)
-    {
-        // Pastikan hanya role siswa yang bisa diakses
-        if ($student->role !== 'student') {
-            abort(404);
-        }
-
-        // Ambil semua jawaban siswa, diindeks berdasarkan ID aktivitas untuk pencarian cepat di view
-        $studentAnswers = $student->answers()->get()->keyBy('hots_activity_id');
-
-        // Ambil semua materi beserta aktivitasnya
-        $materials = ReadingMaterial::with('activities')->latest()->get();
-
-        return view('admin.students.show', compact('student', 'studentAnswers', 'materials'));
-    }
-
-    /**
-     * Menampilkan form untuk menambah siswa baru.
+     * Menampilkan formulir untuk membuat siswa baru secara manual.
      */
     public function create()
     {
@@ -73,28 +30,48 @@ class StudentController extends Controller
     }
 
     /**
-     * Menyimpan siswa baru ke database.
+     * Menyimpan satu siswa baru dari formulir.
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class, 'ends_with:readhub.my.id'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
         ]);
 
+        // Generator ID otomatis
+        $year = date('y');
+        $lastStudent = User::where('student_id', 'like', $year.'%')->orderBy('student_id', 'desc')->first();
+        
+        $newNumber = 1;
+        if ($lastStudent) {
+            $lastIdNumber = (int)substr($lastStudent->student_id, 2);
+            $newNumber = $lastIdNumber + 1;
+        }
+        
+        $studentId = $year . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        
         User::create([
             'name' => $request->name,
+            'student_id' => $studentId,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'student', // Otomatis set role sebagai siswa
+            'password' => Hash::make('password'),
+            'role' => 'student',
         ]);
 
         return redirect()->route('admin.students.index')->with('success', 'Siswa baru berhasil ditambahkan.');
     }
 
     /**
-     * Menampilkan form untuk mengedit data siswa.
+     * Menampilkan detail satu siswa.
+     */
+    public function show(User $student)
+    {
+        return view('admin.students.show', compact('student'));
+    }
+
+    /**
+     * Menampilkan formulir untuk mengedit data siswa.
      */
     public function edit(User $student)
     {
@@ -108,54 +85,82 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$student->id, 'ends_with:readhub.my.id'],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($student->id)],
+            'student_id' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($student->id)],
         ]);
 
-        $student->name = $request->name;
-        $student->email = $request->email;
-
-        // Hanya update password jika diisi
-        if ($request->filled('password')) {
-            $student->password = Hash::make($request->password);
-        }
-
-        $student->save();
+        $student->update($request->all());
 
         return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**
-     * Menghapus siswa dari database.
+     * Menghapus data siswa dari database.
      */
     public function destroy(User $student)
     {
-        // Tambahkan proteksi agar tidak bisa menghapus diri sendiri atau admin lain jika logikanya diperluas
-        if ($student->id === auth()->id()) {
-            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
-        }
-
         $student->delete();
-
         return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil dihapus.');
     }
 
     /**
-     * Menampilkan form untuk import siswa dari spreadsheet.
+     * Menampilkan halaman generator akun siswa dengan rentang ID.
+     */
+    public function showGenerateForm()
+    {
+        return view('admin.students.generate');
+    }
+
+    /**
+     * Membuat banyak akun siswa berdasarkan rentang ID.
+     */
+    public function storeGenerated(Request $request)
+    {
+        $validated = $request->validate([
+            'id_prefix' => ['required', 'string', 'max:20'],
+            'range_start' => ['required', 'integer', 'min:1'],
+            'range_end' => ['required', 'integer', 'gte:range_start'],
+        ]);
+
+        $prefix = $validated['id_prefix'];
+        $start = $validated['range_start'];
+        $end = $validated['range_end'];
+        $createdCount = 0;
+
+        for ($i = $start; $i <= $end; $i++) {
+            $paddedNumber = str_pad($i, 3, '0', STR_PAD_LEFT);
+            $studentId = $prefix . $paddedNumber;
+            $email = $studentId . '@readhub.my.id';
+
+            User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => 'Siswa ' . $studentId,
+                    'student_id' => $studentId,
+                    'password' => Hash::make('password'),
+                    'role' => 'student',
+                ]
+            );
+            $createdCount++;
+        }
+
+        return redirect()->route('admin.students.index')->with('success', $createdCount . ' akun siswa berhasil dibuat.');
+    }
+
+    /**
+     * Menampilkan halaman untuk mengunggah file import.
      */
     public function importForm()
     {
         return view('admin.students.import');
     }
-
+    
     /**
-     * Memproses file spreadsheet untuk import siswa.
+     * Memproses file import siswa dari spreadsheet.
      */
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
 
         try {
             Excel::import(new StudentImport, $request->file('file'));
@@ -165,7 +170,7 @@ class StudentController extends Controller
              foreach ($failures as $failure) {
                  $errorMessages[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
              }
-             return back()->with('error', 'Gagal mengimpor data. Silakan periksa kesalahan berikut: <br>' . implode('<br>', $errorMessages));
+             return back()->with('error', 'Gagal mengimpor data: <br>' . implode('<br>', $errorMessages));
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
         }
@@ -174,53 +179,14 @@ class StudentController extends Controller
     }
 
     /**
-     * Menghasilkan dan mengunduh file template CSV untuk import siswa.
+     * Mengunduh file template untuk import.
      */
     public function downloadTemplate()
     {
         $filename = "template_import_siswa.csv";
         $headers = ['Content-Type' => 'text/csv'];
-        $content = "nama,email\nJohn Doe,john.doe@readhub.my.id\nJane Doe,jane.doe@readhub.my.id";
+        $content = "nama,email\nJohn Doe,john.doe@example.com\nJane Smith,jane.smith@example.com";
 
         return response($content, 200, $headers)->header('Content-Disposition', "attachment; filename={$filename}");
-    }
-    
-    /**
-     * Menampilkan form untuk generate siswa.
-     */
-    public function generateForm()
-    {
-        return view('admin.students.generate');
-    }
-
-    /**
-     * Membuat siswa secara massal berdasarkan range ID.
-     */
-    public function generate(Request $request)
-    {
-        $request->validate([
-            'id_prefix' => 'required|numeric',
-            'range_start' => 'required|numeric|min:1',
-            'range_end' => 'required|numeric|gte:range_start',
-        ]);
-
-        $prefix = $request->id_prefix;
-        $start = $request->range_start;
-        $end = $request->range_end;
-
-        for ($i = $start; $i <= $end; $i++) {
-            $id = $prefix . str_pad($i, 3, '0', STR_PAD_LEFT);
-            $email = $id . '@readhub.my.id';
-
-            User::create([
-                'name' => 'Siswa ' . $id,
-                'email' => $email,
-                'student_id' => $id,
-                'password' => Hash::make($id), // Password sama dengan ID
-                'role' => 'student',
-            ]);
-        }
-
-        return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil digenerate.');
     }
 }
