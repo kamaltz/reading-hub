@@ -20,6 +20,9 @@
                                             @foreach ($material->activities as $activity)
                                                 <li class="p-4 bg-gray-50 rounded-md">
                                                     <p class="font-medium text-gray-700">{{ $activity->question }}</p>
+                                                    @if($activity->image)
+                                                        <img src="{{ asset('storage/' . $activity->image) }}" alt="Question Image" class="max-w-md h-auto mt-2 rounded-lg shadow-md">
+                                                    @endif
                                                     {{-- Di sini Anda bisa menambahkan link untuk mengerjakan soal --}}
                                                     <a href="#" class="mt-2 text-sm text-indigo-600 hover:text-indigo-800">
                                                         Kerjakan Soal &rarr;

@@ -34,25 +34,44 @@ class HotsActivityController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'reading_material_id' => 'required|exists:reading_materials,id',
-            'type' => 'required|in:essay,multiple_choice,true_false,fill_in_blank,image_based',
-            'question' => 'required|string',
-            'options' => 'nullable|array',
-            'correct_answer' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validated = $request->validate([
+                'reading_material_id' => 'required|exists:reading_materials,id',
+                'type' => 'required|in:essay,multiple_choice,true_false,fill_in_blank,image_based',
+                'question' => 'required|string',
+                'options' => 'nullable|array',
+                'correct_answer' => 'nullable',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('activity_images', 'public');
+            // Process options for multiple choice
+            if (($request->type === 'multiple_choice' || $request->type === 'image_based') && $request->options) {
+                $processedOptions = [];
+                foreach ($request->options as $index => $option) {
+                    if (!empty($option)) {
+                        $letter = chr(65 + $index); // A, B, C, D
+                        $processedOptions[$letter] = $option;
+                    }
+                }
+                $validated['options'] = $processedOptions;
+            } else {
+                $validated['options'] = null;
+            }
+
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('activity_images', 'public');
+            }
+            
+            $validated['position'] = HotsActivity::where('reading_material_id', $validated['reading_material_id'])->max('position') + 1;
+
+            HotsActivity::create($validated);
+
+            return redirect()->route('admin.materials.show', $validated['reading_material_id'])
+                             ->with('success', 'Aktivitas berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            \Log::error('Activity Store Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
-        
-        $validated['position'] = HotsActivity::where('reading_material_id', $validated['reading_material_id'])->max('position') + 1;
-
-        HotsActivity::create($validated);
-
-        return redirect()->route('admin.materials.show', $validated['reading_material_id'])
-                         ->with('success', 'Aktivitas berhasil ditambahkan.');
     }
 
     /**

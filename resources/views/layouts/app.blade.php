@@ -39,7 +39,7 @@
                         @if(Auth::check() && Auth::user()->isAdmin())
                             <!-- Manajemen Siswa -->
                             <div class="space-y-1">
-                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-500 uppercase sidebar-text">Manajemen Siswa</div>
+                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-300 uppercase sidebar-text">Manajemen Siswa</div>
                                 <a href="{{ route('admin.students.index') }}" class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.students.index') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                                     <svg class="mr-3 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"></path></svg>
                                     <span class="sidebar-text">Daftar Siswa</span>
@@ -60,7 +60,7 @@
 
                             <!-- Manajemen Materi -->
                             <div class="space-y-1">
-                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-500 uppercase sidebar-text">Manajemen Materi</div>
+                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-300 uppercase sidebar-text">Manajemen Materi</div>
                                 <a href="{{ route('admin.materials.index') }}" class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.materials.index') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                                     <svg class="mr-3 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>
                                     <span class="sidebar-text">Daftar Materi</span>
@@ -81,7 +81,7 @@
 
                             <!-- Manajemen Aktivitas -->
                             <div class="space-y-1">
-                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-500 uppercase sidebar-text">Manajemen Aktivitas</div>
+                                <div class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-300 uppercase sidebar-text">Manajemen Aktivitas</div>
                                 <a href="{{ route('admin.activities.all') }}" class="flex items-center px-4 py-2 transition-colors rounded-lg {{ request()->routeIs('admin.activities.all') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                                     <svg class="mr-3 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                     <span class="sidebar-text">Daftar Aktivitas</span>

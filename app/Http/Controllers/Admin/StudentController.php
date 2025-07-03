@@ -18,6 +18,14 @@ class StudentController extends Controller
     public function index()
     {
         $students = User::where('role', 'student')->latest()->paginate(15);
+        
+        // Calculate progress for each student
+        foreach ($students as $student) {
+            $totalMaterials = \App\Models\ReadingMaterial::count();
+            $completedMaterials = \App\Models\StudentMaterialProgress::where('user_id', $student->id)->count();
+            $student->progress = $totalMaterials > 0 ? round(($completedMaterials / $totalMaterials) * 100) : 0;
+        }
+        
         return view('admin.students.index', compact('students'));
     }
 
@@ -141,7 +149,7 @@ class StudentController extends Controller
             $studentId = $prefix . $paddedNumber;
             $email = $studentId . '@readhub.my.id';
 
-            User::firstOrCreate(
+            $created = User::firstOrCreate(
                 ['email' => $email],
                 [
                     'name' => 'Siswa ' . $studentId,
@@ -150,7 +158,10 @@ class StudentController extends Controller
                     'role' => 'student',
                 ]
             );
-            $createdCount++;
+            
+            if ($created->wasRecentlyCreated) {
+                $createdCount++;
+            }
         }
 
         return redirect()->route('admin.students.index')->with('success', $createdCount . ' akun siswa berhasil dibuat.');
@@ -197,5 +208,14 @@ class StudentController extends Controller
         $content = "nama,email\nJohn Doe,john.doe@example.com\nJane Smith,jane.smith@example.com";
 
         return response($content, 200, $headers)->header('Content-Disposition', "attachment; filename={$filename}");
+    }
+    
+    public function progress()
+    {
+        $progress = \App\Models\StudentMaterialProgress::with(['user', 'readingMaterial'])
+            ->orderBy('completed_at', 'desc')
+            ->paginate(20);
+            
+        return view('admin.students.progress', compact('progress'));
     }
 }

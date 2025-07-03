@@ -14,7 +14,7 @@
                             type: '{{ old('type', $activity->type) }}',
                             matchingOptions: {{ json_encode(old('options', $activity->type === 'matching' ? $activity->options : [['prompt' => '', 'answer' => '']])) }}
                           }"
-                          action="{{ route('admin.activities.update', $activity) }}" method="POST">
+                          action="{{ route('admin.activities.update', $activity) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -23,6 +23,23 @@
                             <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan</label>
                             <textarea name="question" id="question" rows="4" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>{{ old('question', $activity->question) }}</textarea>
                             @error('question') <span class="mt-1 text-sm text-red-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Gambar --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Gambar Saat Ini</label>
+                            @if ($activity->image)
+                                <img src="{{ asset('storage/' . $activity->image) }}" alt="Activity Image" class="mt-2 w-48 h-auto rounded-md shadow">
+                            @else
+                                <p class="mt-2 text-sm text-gray-500">Tidak ada gambar.</p>
+                            @endif
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="image" class="block text-sm font-medium text-gray-700">Ganti Gambar (Opsional)</label>
+                            <input type="file" name="image" id="image" class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
+                            <p class="mt-1 text-sm text-gray-500">Kosongkan jika tidak ingin mengganti gambar.</p>
+                            @error('image') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Tipe Pertanyaan --}}

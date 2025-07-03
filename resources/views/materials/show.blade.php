@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="p-6 text-gray-900 bg-white">
                     <div class="mb-6">
                         <a href="{{ url()->previous() }}" class="text-indigo-600 hover:text-indigo-900">&larr; Kembali</a>
                     </div>
@@ -18,8 +18,17 @@
                     
                     {{-- Rich Text Content --}}
                     @if($material->content)
-                        <div class="mb-6 prose max-w-none">
-                            {!! $material->content !!}
+                        <div class="mb-6 prose max-w-none prose-material">
+                            <div class="text-gray-900 bg-white p-6 rounded-lg border border-gray-200">
+                                <style>
+                                    .prose-material * { color: #374151 !important; }
+                                    .prose-material h1, .prose-material h2, .prose-material h3, .prose-material h4, .prose-material h5, .prose-material h6 { color: #111827 !important; font-weight: 600; }
+                                    .prose-material p { color: #374151 !important; line-height: 1.7; }
+                                    .prose-material strong { color: #111827 !important; font-weight: 600; }
+                                    .prose-material ul, .prose-material ol, .prose-material li { color: #374151 !important; }
+                                </style>
+                                {!! $material->content !!}
+                            </div>
                         </div>
                     @endif
 
@@ -75,7 +84,7 @@
                                             @endif
                                         </div>
                                         <p class="text-sm text-gray-600 mb-1">Jawaban Anda:</p>
-                                        <p class="font-medium">{{ $userAnswer->answer }}</p>
+                                        <p class="font-medium text-gray-900">{{ $userAnswer->student_answer }}</p>
                                     </div>
                                 @endif
                             </div>
@@ -95,13 +104,13 @@
                                             @endif
                                         </div>
 
-                                        @if($activity->type === 'multiple_choice')
+                                        @if($activity->type === 'multiple_choice' || $activity->type === 'image_based')
                                             <div class="space-y-2">
                                                 @if($activity->options && is_array($activity->options))
                                                     @foreach($activity->options as $key => $option)
                                                         <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                                                             <input type="radio" name="answers[{{ $activity->id }}]" value="{{ $key }}" class="mr-3 text-indigo-600" required>
-                                                            <span>{{ $key }}. {{ $option }}</span>
+                                                            <span class="text-gray-900">{{ $key }}. {{ $option }}</span>
                                                         </label>
                                                     @endforeach
                                                 @endif
@@ -111,11 +120,11 @@
                                             <div class="space-y-2">
                                                 <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                                                     <input type="radio" name="answers[{{ $activity->id }}]" value="true" class="mr-3 text-indigo-600" required>
-                                                    <span>Benar</span>
+                                                    <span class="text-gray-900">Benar</span>
                                                 </label>
                                                 <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                                                     <input type="radio" name="answers[{{ $activity->id }}]" value="false" class="mr-3 text-indigo-600" required>
-                                                    <span>Salah</span>
+                                                    <span class="text-gray-900">Salah</span>
                                                 </label>
                                             </div>
                                         

@@ -1,0 +1,45 @@
+/* Material content styling for better readability */
+.prose-material {
+    color: #1f2937 !important;
+}
+
+.prose-material h1,
+.prose-material h2,
+.prose-material h3,
+.prose-material h4,
+.prose-material h5,
+.prose-material h6 {
+    color: #111827 !important;
+    font-weight: 600;
+}
+
+.prose-material p {
+    color: #374151 !important;
+    line-height: 1.7;
+}
+
+.prose-material ul,
+.prose-material ol {
+    color: #374151 !important;
+}
+
+.prose-material li {
+    color: #374151 !important;
+    margin-bottom: 0.5rem;
+}
+
+.prose-material strong {
+    color: #111827 !important;
+    font-weight: 600;
+}
+
+.prose-material em {
+    color: #374151 !important;
+}
+
+.prose-material blockquote {
+    color: #4b5563 !important;
+    border-left: 4px solid #d1d5db;
+    padding-left: 1rem;
+    font-style: italic;
+}

@@ -79,6 +79,7 @@ Route::prefix('admin')
         Route::get('students/import', [StudentController::class, 'importForm'])->name('students.import.form');
         Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
         Route::get('students/template', [StudentController::class, 'downloadTemplate'])->name('students.template');
+        Route::get('students/progress/view', [StudentController::class, 'progress'])->name('students.progress');
         Route::resource('students', StudentController::class);
         
         // --- Rute Manajemen Aktivitas ---

@@ -41,9 +41,9 @@
 
                         <!-- Konten -->
                         <div class="mb-4">
-                            <label for="content" class="block text-sm font-medium text-gray-700">Konten</label>
+                            <label for="content" class="block text-sm font-medium text-gray-700 mb-2">Konten</label>
                             <textarea name="content" style="display:none;">{{ old('content', $material->content) }}</textarea>
-                            <div class="quill-editor" style="height: 400px;"></div>
+                            <div class="quill-editor" style="height: 400px; border: 1px solid #d1d5db; border-radius: 0.375rem; resize: vertical; overflow: auto; min-height: 200px; max-height: 800px;"></div>
                             @error('content') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                         </div>
 
@@ -81,4 +81,35 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    
+    <script>
+        var quill = new Quill('.quill-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        quill.on('text-change', function() {
+            document.querySelector('textarea[name="content"]').value = quill.root.innerHTML;
+        });
+
+        // Set initial content
+        quill.root.innerHTML = {!! json_encode($material->content) !!};
+        
+
+    </script>
 </x-app-layout>

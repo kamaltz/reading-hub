@@ -31,6 +31,9 @@
                         @endphp
                         <div class="py-6 border-t border-gray-200">
                             <p class="mb-2 font-semibold">{{ $loop->iteration }}. {{ $activity->question }}</p>
+                            @if($activity->image)
+                                <img src="{{ asset('storage/' . $activity->image) }}" alt="Question Image" class="max-w-md h-auto mb-4 rounded-lg shadow-md">
+                            @endif
 
                             @if($userAnswer)
                                 <!-- Tampilkan jawaban yang sudah dikirim -->

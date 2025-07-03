@@ -36,21 +36,52 @@ class ReadingMaterialController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'chapter_id' => 'required|exists:chapters,id',
-            'genre_id' => 'required|exists:genres,id',
-            'illustration' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+                'chapter_id' => 'required|exists:chapters,id',
+                'genre_id' => 'required|exists:genres,id',
+                'illustration' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'description' => 'nullable|string|max:500',
+                'selected_questions' => 'nullable|string',
+            ]);
 
-        if ($request->hasFile('illustration')) {
-            $validated['illustration'] = $request->file('illustration')->store('illustrations', 'public');
+            if ($request->hasFile('illustration')) {
+                $validated['illustration'] = $request->file('illustration')->store('illustrations', 'public');
+            }
+
+            $material = ReadingMaterial::create($validated);
+            
+            // Add selected questions as activities
+            if ($request->selected_questions) {
+                Log::info('Selected questions received: ' . $request->selected_questions);
+                $questions = json_decode($request->selected_questions, true);
+                if ($questions && is_array($questions)) {
+                    Log::info('Processing ' . count($questions) . ' questions');
+                    foreach ($questions as $index => $question) {
+                        $activity = \App\Models\HotsActivity::create([
+                            'reading_material_id' => $material->id,
+                            'type' => $question['type'] ?? 'multiple_choice',
+                            'question' => $question['question'] ?? '',
+                            'options' => isset($question['options']) ? $question['options'] : null,
+                            'correct_answer' => $question['correct_answer'] ?? '',
+                            'position' => $index + 1,
+                        ]);
+                        Log::info('Created activity: ' . $activity->id . ' - ' . $activity->question);
+                    }
+                } else {
+                    Log::error('Questions decode failed or not array');
+                }
+            } else {
+                Log::info('No selected questions received');
+            }
+
+            return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dibuat.');
+        } catch (\Exception $e) {
+            Log::error('Material Store Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
-
-        ReadingMaterial::create($validated);
-
-        return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dibuat.');
     }
 
     /**
@@ -140,8 +171,10 @@ class ReadingMaterialController extends Controller
                 return response()->json(['error' => 'Genre not found'], 404);
             }
             
+            $enhancedPrompt = $validated['prompt'] . '. Also generate 5 related questions with different types (multiple choice, essay, true/false, fill in blank). Format as JSON with "title", "content", and "questions" array where each question has: type, question, options (for multiple choice), correct_answer.';
+            
             $aiService = new \App\Services\AIContentService();
-            $result = $aiService->generateFromPrompt($validated['prompt'], $genre->name);
+            $result = $aiService->generateFromPrompt($enhancedPrompt, $genre->name);
             
             if (isset($result['error'])) {
                 return response()->json(['error' => $result['error']], 500);
@@ -149,15 +182,12 @@ class ReadingMaterialController extends Controller
 
             return response()->json([
                 'title' => $result['title'] ?? 'Generated Content',
-                'content' => $result['content'] ?? '<p>Content generation failed</p>'
+                'content' => $result['content'] ?? '<p>Content generation failed</p>',
+                'questions' => $result['questions'] ?? []
             ]);
         } catch (\Exception $e) {
             Log::error('AI Generation Error: ' . $e->getMessage());
-            Log::error('API Key Status: ' . (env('GEMINI_API_KEY') ? 'Found' : 'Not found'));
-            return response()->json([
-                'title' => 'Error Debug',
-                'content' => '<h3>Debug Info</h3><p>Error: ' . $e->getMessage() . '</p><p>API Key: ' . (env('GEMINI_API_KEY') ? 'Configured' : 'Missing') . '</p>'
-            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -167,7 +197,7 @@ class ReadingMaterialController extends Controller
         
         try {
             $validated = $request->validate([
-                'pdf_file' => 'required|file|mimes:pdf|max:10240',
+                'pdf_file' => 'required|file|mimes:pdf|max:51200',
                 'genre_id' => 'required|integer|exists:genres,id',
                 'prompt' => 'required|string|max:500',
             ]);

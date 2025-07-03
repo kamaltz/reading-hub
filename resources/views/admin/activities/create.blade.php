@@ -7,8 +7,8 @@
 
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 bg-white">
                     <!-- AI Question Generator Section -->
                     <div class="overflow-hidden mb-10 bg-white rounded-2xl border border-gray-100 shadow-lg">
                         <div class="px-8 py-6 bg-gradient-to-r from-indigo-600 to-purple-600">
@@ -58,16 +58,7 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                                            <label class="text-sm font-medium text-gray-700">Number of questions:</label>
-                                            <select id="questionCount" class="px-3 py-2 text-sm text-gray-700 rounded-md border border-gray-300 focus:ring-2 focus:ring-purple-500">
-                                                <option style="color:grey;" value="1">1 Question</option>
-                                                <option style="color:grey;" value="2">2 Questions</option>
-                                                <option style="color:black;" value="3" selected>3 Questions</option>
-                                                <option style="color:grey;" value="4">4 Questions</option>
-                                                <option style="color:grey;" value="5">5 Questions</option>
-                                            </select>
-                                        </div>
+
                                         
                                         <button type="button" onclick="generateAIQuestions()" style="color:black;"class="px-6 py-3 w-full font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-md transition-all duration-200 text-grey-700 hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg">
                                             ✨ Generate Questions
@@ -248,17 +239,24 @@
                         </div>
 
                         {{-- Unggah Gambar --}}
-                        <div class="mb-6">
+                        <div class="mb-6" id="imageSection">
                             <label for="image" class="block mb-2 text-sm font-medium text-gray-700">🖼️ Gambar (Opsional)</label>
                             <div class="p-6 text-center rounded-lg border-2 border-gray-300 border-dashed transition hover:border-indigo-400">
-                                <input type="file" name="image" id="image" class="hidden" accept="image/*">
+                                <input type="file" name="image" id="image" class="hidden" accept="image/*" onchange="previewImage(this)">
                                 <label for="image" class="cursor-pointer">
-                                    <div class="mb-2 text-gray-400">
-                                        <svg class="mx-auto w-12 h-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
+                                    <div id="imagePreview" class="hidden mb-4">
+                                        <img id="previewImg" class="mx-auto max-w-xs h-auto rounded-lg shadow-md">
+                                        <button type="button" onclick="removeImage()" class="mt-2 px-3 py-1 text-sm text-red-600 bg-red-100 rounded hover:bg-red-200">Remove</button>
                                     </div>
-                                    <p class="text-sm text-gray-600">Click to upload image</p>
+                                    <div id="uploadPrompt">
+                                        <div class="mb-2 text-gray-400">
+                                            <svg class="mx-auto w-12 h-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-sm text-gray-600">Click to upload image</p>
+                                        <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF up to 2MB</p>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -297,28 +295,63 @@
         function toggleOptionsSection(type) {
             const optionsSection = document.getElementById('optionsSection');
             const correctAnswerInput = document.getElementById('correct_answer');
+            const imageSection = document.getElementById('imageSection');
             
             if (type === 'multiple_choice') {
                 optionsSection.style.display = 'block';
                 correctAnswerInput.placeholder = 'Contoh: A, B, C, atau D';
+                imageSection.style.display = 'block';
             } else if (type === 'true_false') {
                 optionsSection.style.display = 'none';
                 correctAnswerInput.placeholder = 'Benar atau Salah';
+                imageSection.style.display = 'block';
             } else if (type === 'fill_in_blank') {
                 optionsSection.style.display = 'none';
                 correctAnswerInput.placeholder = 'Jawaban yang benar';
+                imageSection.style.display = 'block';
             } else if (type === 'essay') {
                 optionsSection.style.display = 'none';
                 correctAnswerInput.placeholder = 'Poin-poin jawaban yang diharapkan';
+                imageSection.style.display = 'block';
+            } else if (type === 'image_based') {
+                optionsSection.style.display = 'block';
+                correctAnswerInput.placeholder = 'Jawaban berdasarkan gambar';
+                imageSection.style.display = 'block';
             } else {
                 optionsSection.style.display = 'none';
                 correctAnswerInput.placeholder = 'Jawaban yang benar';
+                imageSection.style.display = 'block';
             }
+        }
+        
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                // Check file size (2MB limit)
+                if (input.files[0].size > 2 * 1024 * 1024) {
+                    alert('File terlalu besar. Maksimal 2MB.');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('uploadPrompt').classList.add('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeImage() {
+            document.getElementById('image').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('uploadPrompt').classList.remove('hidden');
         }
         
         async function generateAIQuestions() {
             const prompt = document.getElementById('aiPrompt').value;
-            const questionCount = document.getElementById('questionCount').value;
+            const questionCount = 1; // Fixed to 1 question
             const selectedTypes = Array.from(document.querySelectorAll('.question-type:checked')).map(cb => cb.value);
             const status = document.getElementById('aiStatus');
             
@@ -334,17 +367,15 @@
             
             status.innerHTML = '<span class="text-blue-600">🔄 Generating questions with AI...</span>';
             
-            const fullPrompt = `Generate ${questionCount} educational questions about: ${prompt}. 
+            const fullPrompt = `Generate 1 educational question about: ${prompt}. 
             
-Use these question types: ${selectedTypes.join(', ')}.
+Use this question type: ${selectedTypes[0] || 'multiple_choice'}.
             
-Format each question as plain text with this structure:
+Format the question as plain text with this structure:
 Question: [question text]
 Type: [question type]
 Options: A) option1, B) option2, C) option3, D) option4 (only for multiple choice)
-Answer: [correct answer]
-
-Separate each question with ---`;
+Answer: [correct answer]`;
             
             try {
                 const response = await fetch('{{ route("admin.materials.generate-ai") }}', {
