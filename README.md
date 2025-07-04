@@ -1,115 +1,173 @@
-Tutorial Instalasi Proyek Reading Hub (Laravel)
-Dokumen ini akan memandu Anda melalui proses untuk mengkloning (clone), mengkonfigurasi, dan menjalankan proyek Laravel "Reading Hub" di komputer lokal Anda.
+# Reading Hub - Platform Pembelajaran Bahasa Inggris
 
-Prasyarat (Perangkat Lunak yang Dibutuhkan)
-Sebelum memulai, pastikan Anda memiliki lingkungan pengembangan yang siap. Kami sangat merekomendasikan penggunaan Laragon karena sudah mencakup hampir semua yang Anda butuhkan dalam satu paket instalasi.
+Reading Hub adalah aplikasi web berbasis Laravel untuk pembelajaran Bahasa Inggris dengan fokus pada reading comprehension dan HOTS (Higher Order Thinking Skills) activities.
 
-Opsi 1: Instalasi Menggunakan Laragon (Sangat Direkomendasikan)
-Laragon adalah lingkungan pengembangan lokal portabel, terisolasi, cepat, dan kuat untuk PHP, Node.js, Python, Java, Go, Ruby. Laragon sudah mencakup Git, PHP, Composer, server database (MySQL), dan terminal yang terintegrasi.
+## Fitur Aplikasi
 
-Unduh dan Instal Laragon:
+### Untuk Admin
+- **Manajemen Konten**: Upload dan edit materi bacaan
+- **Manajemen Soal**: Buat soal dengan berbagai jenis (Multiple Choice, Essay, True/False, Fill in Blank)
+- **Manajemen Siswa**: Import siswa dari Excel, monitoring progress
+- **Dashboard Analytics**: Statistik pembelajaran dan progress siswa
+- **Manajemen Chapter**: Organisasi materi berdasarkan bab
 
-Kunjungi situs web resmi Laragon: https://laragon.org/download/
+### Untuk Siswa
+- **Reading Materials**: Akses materi bacaan dengan berbagai genre
+- **Interactive Exercises**: Kerjakan soal dengan feedback langsung
+- **Progress Tracking**: Monitor kemajuan belajar pribadi
+- **Responsive Design**: Akses dari desktop dan mobile
 
-Unduh versi Laragon - Full.
+### Jenis Teks yang Didukung
+- Narrative Text
+- Descriptive Text
+- Procedure Text
+- Recount Text
+- Report Text
+- Announcement Text
 
-Jalankan installer dan ikuti petunjuk di layar. Disarankan untuk tidak menginstalnya di direktori C:\Program Files untuk menghindari masalah perizinan. Gunakan direktori seperti C:\laragon.
+## Instalasi
 
-Jalankan Laragon:
+### Prasyarat
+- PHP 8.1+
+- Composer
+- Node.js & NPM
+- MySQL/MariaDB
+- Git
 
-Setelah instalasi selesai, buka Laragon.
+**Rekomendasi**: Gunakan [Laragon](https://laragon.org/download/) yang sudah include semua tools di atas.
 
-Klik tombol "Start All". Ini akan menjalankan server web Apache/Nginx dan server database MySQL.
+### Langkah Instalasi
 
-Buka Terminal Laragon:
+1. **Clone Repository**
+   ```bash
+   git clone [URL_REPOSITORY] reading-hub
+   cd reading-hub
+   ```
 
-Klik tombol "Terminal" di jendela utama Laragon. Terminal ini sudah memiliki akses ke PHP, Composer, Git, dan Node.js/NPM.
+2. **Install Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
 
-Semua perintah selanjutnya dalam tutorial ini harus dijalankan melalui Terminal Laragon ini.
+3. **Setup Environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-Dengan menggunakan Laragon, Anda dapat melewatkan instalasi manual untuk Git, PHP, Composer, dan server database.
+4. **Konfigurasi Database**
+   Edit file `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=reading_hub_db
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-Opsi 2: Instalasi Manual
-Jika Anda tidak menggunakan Laragon, pastikan Anda telah menginstal perangkat lunak berikut secara terpisah:
+5. **Setup Database**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   php artisan storage:link
+   ```
 
-Git: Untuk mengkloning repositori. Unduh Git
+6. **Jalankan Aplikasi**
+   ```bash
+   # Terminal 1
+   php artisan serve
+   
+   # Terminal 2
+   npm run dev
+   ```
 
-PHP: Versi 8.1 atau lebih baru. Unduh PHP
+   Akses: http://127.0.0.1:8000
 
-Composer: Manajer dependensi untuk PHP. Unduh Composer
+## Seeder yang Tersedia
 
-Node.js & NPM: Untuk mengelola dependensi JavaScript. Unduh Node.js
+### 1. DatabaseSeeder
+Seeder utama yang menjalankan semua seeder lain:
+```bash
+php artisan db:seed
+```
 
-Database Server: Seperti MySQL atau MariaDB (misalnya dari XAMPP).
+### 2. EducationalContentSeeder
+Membuat data contoh:
+- 5 Genre teks
+- 6 Chapter contoh
+- 3 Reading materials (Lake Toba, Borobudur, Fried Rice)
+- 12 HOTS activities dengan berbagai jenis soal
 
-Langkah 1: Clone Repositori dari Git
-Buka Terminal Laragon (atau terminal biasa jika tidak memakai Laragon), navigasikan ke direktori www di dalam folder instalasi Laragon (cd C:/laragon/www), lalu jalankan perintah berikut. Ganti [URL_REPOSITORY_ANDA] dengan URL repositori Git proyek Anda.
+### 3. EnglishTextbookSeeder
+Konten lengkap Bab 1-6 Bahasa Inggris:
+- Chapter 1: Great Athletes (Cristiano Ronaldo)
+- Chapter 2: Sports Events (School Sports Day)
+- Chapter 3: Daily Activities (Morning Routine)
+- Chapter 4: Holiday Destinations (Bali)
+- Chapter 5: Natural Wonders (Niagara Falls)
+- Chapter 6: Announcements (Science Fair)
+- Total: 25 soal dengan berbagai jenis
 
-git clone [URL_REPOSITORY_ANDA] reading-hub
+```bash
+# Jalankan seeder khusus
+php artisan db:seed --class=EnglishTextbookSeeder
+```
 
-Setelah selesai, masuk ke direktori proyek yang baru dibuat:
+### 4. Upload Materi Tambahan
+Gunakan file SQL untuk import langsung:
+```bash
+mysql -u root -p reading_hub_db < database/sql/english_textbook_chapters_1_6.sql
+```
 
-cd reading-hub
+## Detail Login
 
-Langkah 2: Instal Dependensi PHP
-Gunakan Composer untuk menginstal semua pustaka PHP yang dibutuhkan.
+### Akun Default (Dibuat oleh DatabaseSeeder)
 
-composer install
+**Admin:**
+- Email: `admin@readhub.my.id`
+- Password: `password`
+- Role: Admin
+- Akses: Dashboard admin, manajemen konten, analytics
 
-Langkah 3: Instal Dependensi JavaScript
-Selanjutnya, instal semua paket JavaScript yang dibutuhkan menggunakan NPM.
+**Siswa:**
+- Email: `siswa@readhub.my.id`
+- Password: `password`
+- Role: Student
+- Akses: Materi bacaan, latihan soal, progress tracking
 
-npm install
+### Fitur Login
+- **Session Management**: Auto logout setelah idle
+- **Role-based Access**: Admin dan Student memiliki dashboard berbeda
+- **Remember Me**: Opsi tetap login
+- **Password Reset**: Fitur lupa password (perlu konfigurasi email)
 
-Langkah 4: Konfigurasi File Lingkungan (.env)
-Salin file .env.example menjadi file baru bernama .env.
+### Import Siswa Massal
+Admin dapat import siswa dari file Excel:
+1. Login sebagai admin
+2. Masuk ke menu "Students"
+3. Klik "Import Students"
+4. Upload file Excel dengan format: name, email, student_id
 
-cp .env.example .env
+## Struktur Database
 
-Langkah 5: Buat Kunci Aplikasi (Application Key)
-Jalankan perintah Artisan berikut untuk membuat kunci enkripsi yang unik.
+- `users` - Data pengguna (admin/siswa)
+- `genres` - Jenis teks (narrative, descriptive, dll)
+- `chapters` - Bab pembelajaran
+- `reading_materials` - Materi bacaan
+- `hots_activities` - Soal-soal latihan
+- `student_hots_activity_answers` - Jawaban siswa
+- `student_material_progress` - Progress belajar siswa
 
-php artisan key:generate
+## Teknologi
 
-Langkah 6: Konfigurasi Database
-Jika menggunakan Laragon: Klik tombol "Database" di jendela Laragon. Ini akan membuka HeidiSQL.
+- **Backend**: Laravel 11
+- **Frontend**: Blade Templates, TailwindCSS
+- **Database**: MySQL
+- **Build Tool**: Vite
+- **Import/Export**: Maatwebsite Excel
 
-Di HeidiSQL, klik kanan di panel kiri -> Create new -> Database.
+## Support
 
-Beri nama database, contohnya: reading_hub_db.
-
-Buka file .env dengan editor teks.
-
-Sesuaikan konfigurasi database. Untuk Laragon, username default adalah root dan password kosong.
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=reading_hub_db // Ganti dengan nama database Anda
-DB_USERNAME=root // Username default Laragon
-DB_PASSWORD= // Password default Laragon kosong
-
-Langkah 7: Jalankan Migrasi Database
-Setelah database dikonfigurasi, jalankan perintah migrasi untuk membuat semua tabel.
-
-php artisan migrate
-
-Catatan: Jika Anda ingin menjalankan migrasi dari awal dan menghapus semua data, gunakan php artisan migrate:fresh.
-
-Langkah 8: Hubungkan Penyimpanan (Storage)
-Buat tautan simbolis (symbolic link) agar file yang diunggah dapat diakses dari web.
-
-php artisan storage:link
-
-Langkah 9: Jalankan Server Pengembangan
-Sekarang, Anda siap untuk menjalankan aplikasi!
-
-Jalankan server PHP Laravel:
-
-php artisan serve
-
-Jalankan Vite untuk kompilasi aset (CSS & JS): Buka Terminal Laragon baru, navigasikan ke direktori proyek (cd C:/laragon/www/reading-hub), dan jalankan:
-
-npm run dev
-
-Setelah kedua server berjalan, buka browser Anda dan kunjungi alamat yang diberikan oleh php artisan serve (biasanya http://127.0.0.1:8000).
+Untuk bantuan teknis atau pertanyaan, silakan buat issue di repository ini.
