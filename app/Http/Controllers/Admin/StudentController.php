@@ -19,10 +19,17 @@ class StudentController extends Controller
     {
         $students = User::where('role', 'student')->latest()->paginate(15);
         
-        // Calculate progress for each student
+        // Calculate progress for each student based on actual answers
         foreach ($students as $student) {
-            $totalMaterials = \App\Models\ReadingMaterial::count();
-            $completedMaterials = \App\Models\StudentMaterialProgress::where('user_id', $student->id)->count();
+            $totalMaterials = \App\Models\ReadingMaterial::whereHas('activities')->count();
+            
+            // Count materials where student has answered at least one activity
+            $completedMaterials = \App\Models\ReadingMaterial::whereHas('activities', function($query) use ($student) {
+                $query->whereHas('studentAnswers', function($subQuery) use ($student) {
+                    $subQuery->where('user_id', $student->id);
+                });
+            })->count();
+            
             $student->progress = $totalMaterials > 0 ? round(($completedMaterials / $totalMaterials) * 100) : 0;
         }
         
@@ -82,7 +89,7 @@ class StudentController extends Controller
      */
     public function show(User $student)
     {
-        $studentAnswers = $student->answers;
+        $studentAnswers = $student->answers()->get()->keyBy('hots_activity_id');
         $materials = \App\Models\ReadingMaterial::with('activities')->get();
         return view('admin.students.show', compact('student', 'studentAnswers', 'materials'));
     }

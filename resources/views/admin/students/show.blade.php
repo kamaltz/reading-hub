@@ -42,8 +42,11 @@
                                     @foreach ($material->activities as $activity)
                                         <li class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                                             <p class="text-gray-700">{{ $activity->question }}</p>
-                                            @if (isset($studentAnswers[$activity->id]))
-                                                @if ($studentAnswers[$activity->id]->is_correct)
+                                            @php
+                                                $answer = $studentAnswers->get($activity->id);
+                                            @endphp
+                                            @if ($answer)
+                                                @if ($answer->is_correct)
                                                     <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Benar</span>
                                                 @else
                                                     <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Salah</span>

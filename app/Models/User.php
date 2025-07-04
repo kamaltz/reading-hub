@@ -46,7 +46,15 @@ class User extends Authenticatable
      */
     public function answers(): HasMany
     {
-        // Pastikan Anda sudah punya model StudentHotsActivityAnswer
+        return $this->hasMany(StudentHotsActivityAnswer::class);
+    }
+    
+    /**
+     * Alias untuk relasi answers (untuk backward compatibility)
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function studentHotsActivityAnswers(): HasMany
+    {
         return $this->hasMany(StudentHotsActivityAnswer::class);
     }
 }

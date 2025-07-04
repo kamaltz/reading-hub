@@ -39,9 +39,10 @@
                     @endif
 
                     @php
-                        $hasAnswered = Auth::user()->answers->whereIn('hots_activity_id', $material->activities->pluck('id'))->count() > 0;
+                        $userAnswers = Auth::user()->answers()->whereIn('hots_activity_id', $material->activities->pluck('id'))->get();
+                        $hasAnswered = $userAnswers->count() > 0;
                         $totalQuestions = $material->activities->count();
-                        $correctAnswers = Auth::user()->answers->whereIn('hots_activity_id', $material->activities->pluck('id'))->where('is_correct', true)->count();
+                        $correctAnswers = $userAnswers->where('is_correct', true)->count();
                         $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
                     @endphp
 
@@ -58,7 +59,7 @@
                         <!-- Show Questions with Answers -->
                         @foreach ($material->activities as $activity)
                             @php
-                                $userAnswer = Auth::user()->answers->keyBy('hots_activity_id')->get($activity->id);
+                                $userAnswer = $userAnswers->where('hots_activity_id', $activity->id)->first();
                             @endphp
                             <div class="py-6 border-t border-gray-200">
                                 <div class="mb-4">
@@ -69,22 +70,52 @@
                                 </div>
                                 
                                 @if($userAnswer)
-                                    <div class="p-4 {{ $userAnswer->is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }} rounded-lg">
-                                        <div class="flex items-center mb-2">
-                                            @if($userAnswer->is_correct)
-                                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                <span class="font-semibold text-green-800">Jawaban Benar</span>
-                                            @else
-                                                <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
-                                                </svg>
-                                                <span class="font-semibold text-red-800">Jawaban Salah</span>
-                                            @endif
+                                    <div class="space-y-3">
+                                        <!-- User's Answer -->
+                                        <div class="p-4 {{ $userAnswer->is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }} rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                @if($userAnswer->is_correct)
+                                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <span class="font-semibold text-green-800">Jawaban Benar</span>
+                                                @else
+                                                    <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                                                    </svg>
+                                                    <span class="font-semibold text-red-800">Jawaban Salah</span>
+                                                @endif
+                                            </div>
+                                            <p class="text-sm text-gray-600 mb-1">Jawaban Anda:</p>
+                                            <p class="font-medium text-gray-900">
+                                                @if($activity->type === 'multiple_choice' && $activity->options && is_array($activity->options))
+                                                    {{ $userAnswer->student_answer }}. {{ $activity->options[$userAnswer->student_answer] ?? $userAnswer->student_answer }}
+                                                @elseif($activity->type === 'true_false')
+                                                    {{ $userAnswer->student_answer === 'true' ? 'Benar' : 'Salah' }}
+                                                @else
+                                                    {{ $userAnswer->student_answer }}
+                                                @endif
+                                            </p>
                                         </div>
-                                        <p class="text-sm text-gray-600 mb-1">Jawaban Anda:</p>
-                                        <p class="font-medium text-gray-900">{{ $userAnswer->student_answer }}</p>
+                                        
+                                        <!-- Correct Answer (if wrong) -->
+                                        @if(!$userAnswer->is_correct)
+                                            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <p class="text-sm text-blue-600 mb-1">Jawaban yang benar:</p>
+                                                <p class="font-medium text-blue-900">
+                                                    @php
+                                                        $correctAnswer = is_array($activity->correct_answer) ? $activity->correct_answer[0] : $activity->correct_answer;
+                                                    @endphp
+                                                    @if($activity->type === 'multiple_choice' && $activity->options && is_array($activity->options))
+                                                        {{ $correctAnswer }}. {{ $activity->options[$correctAnswer] ?? $correctAnswer }}
+                                                    @elseif($activity->type === 'true_false')
+                                                        {{ strtolower($correctAnswer) === 'true' ? 'Benar' : 'Salah' }}
+                                                    @else
+                                                        {{ $correctAnswer }}
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             </div>

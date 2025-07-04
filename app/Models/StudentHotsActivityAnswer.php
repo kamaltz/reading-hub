@@ -12,7 +12,7 @@ class StudentHotsActivityAnswer extends Model
     protected $fillable = [
         'user_id',
         'hots_activity_id',
-        'answer',
+        'student_answer',
         'is_correct',
         'score',
     ];

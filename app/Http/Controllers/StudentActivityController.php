@@ -172,7 +172,7 @@ class StudentActivityController extends Controller
                     }
                     $totalCount++;
                     
-                    StudentHotsActivityAnswer::updateOrCreate(
+                    $answerRecord = StudentHotsActivityAnswer::updateOrCreate(
                         [
                             'user_id' => $user->id,
                             'hots_activity_id' => $activity->id,
@@ -183,6 +183,8 @@ class StudentActivityController extends Controller
                             'score' => $isCorrect ? 100 : 0,
                         ]
                     );
+                    
+                    \Log::info('Answer saved: User ' . $user->id . ', Activity ' . $activity->id . ', Answer: ' . $userAnswer);
                 }
             }
             
@@ -202,10 +204,13 @@ class StudentActivityController extends Controller
                 ]
             );
             
+            \Log::info('Progress saved for user ' . $user->id . ' material ' . $materialId . ' score: ' . $score . ' (' . $correctCount . '/' . $totalCount . ')');
+            
             return redirect()->route('materials.show', $materialId)
                              ->with('success', "✅ Materi selesai! Nilai Anda: {$score}/100 ({$correctCount}/{$totalCount} benar)");
         } catch (\Exception $e) {
             \Log::error('Submit Material Error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan jawaban: ' . $e->getMessage()]);
         }
     }

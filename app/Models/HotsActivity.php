@@ -43,4 +43,12 @@ class HotsActivity extends Model
     {
         return $this->belongsTo(ReadingMaterial::class);
     }
+    
+    /**
+     * Relasi ke jawaban siswa.
+     */
+    public function studentAnswers()
+    {
+        return $this->hasMany(StudentHotsActivityAnswer::class);
+    }
 }
